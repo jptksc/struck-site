@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy — Struck</title>
+<meta name="description" content="Struck's privacy policy: your tasks live in one file on your Mac and go nowhere else. No accounts, no analytics, no servers of ours.">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<style>
+  :root {
+    --paper: #f2e6d3;
+    --glass: rgba(243, 232, 213, 0.78);
+    --ink: #38322a;
+    --ink-40: rgba(56, 50, 42, 0.4);
+    --ink-soft: rgba(56, 50, 42, 0.55);
+    --rule: rgba(56, 50, 42, 0.11);
+    --marker: #a8e43c;
+    --desk1: #e9e1d2;
+    --desk2: #d6cab4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0d1311;
+      --glass: rgba(13, 19, 17, 0.68);
+      --ink: #d6e7dd;
+      --ink-40: rgba(214, 231, 221, 0.4);
+      --ink-soft: rgba(214, 231, 221, 0.55);
+      --rule: rgba(214, 231, 221, 0.1);
+      --marker: #2f5f9d;
+      --desk1: #141a1e;
+      --desk2: #07090c;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+    background: linear-gradient(165deg, var(--desk1), var(--desk2));
+    background-attachment: fixed;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.65;
+  }
+  .wrap {
+    max-width: 660px;
+    margin: 0 auto;
+    padding: clamp(48px, 9vw, 96px) clamp(20px, 5vw, 48px) clamp(56px, 8vw, 88px);
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-decoration: none;
+    margin-bottom: clamp(28px, 5vw, 44px);
+    transition: color 0.2s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .back:hover { color: var(--ink); transform: translateX(-2px); }
+  .back svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+  h1 { font-size: clamp(36px, 6vw, 56px); line-height: 1.05; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 10px; }
+  .sub { color: var(--ink-soft); font-size: 15.5px; font-weight: 500; margin-bottom: clamp(30px, 5vw, 44px); }
+
+  h2 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 38px 0 14px;
+  }
+  p { font-size: 16px; margin-bottom: 12px; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13.5px;
+    background: rgba(127, 127, 127, 0.14);
+    padding: 2px 6px;
+    border-radius: 5px;
+  }
+  a.link { color: var(--ink); font-weight: 600; text-decoration: none; border-bottom: 1.5px solid var(--marker); }
+
+  .tldr {
+    padding: 22px 26px;
+    border-radius: 16px;
+    background: var(--glass);
+    backdrop-filter: blur(20px) saturate(1.2);
+    -webkit-backdrop-filter: blur(20px) saturate(1.2);
+    box-shadow: 0 14px 34px -18px rgba(0, 0, 0, 0.4);
+    margin-bottom: clamp(30px, 5vw, 42px);
+  }
+  .tldr strong { font-size: clamp(18px, 2.2vw, 21px); font-weight: 700; letter-spacing: -0.02em; display: block; margin-bottom: 4px; }
+  .tldr p { font-size: 15px; margin: 0; color: var(--ink-soft); }
+
+  footer {
+    margin-top: clamp(40px, 6vw, 60px);
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+  footer a { color: inherit; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <a class="back" href="../">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+    Struck
+  </a>
+
+  <h1>Privacy</h1>
+  <p class="sub">Effective September 1, 2026 &middot; Applies to the Struck app and this website, both made by Circa75 Media, LLC (&#8220;we&#8221;).</p>
+
+  <div class="tldr">
+    <strong>The short version</strong>
+    <p>Your tasks live on your Mac. Struck has no accounts, no analytics, no tracking, and no servers of ours &#8212; we couldn&#8217;t read your to-do list if we wanted to, and we don&#8217;t want to. Nothing you write leaves your machine unless you switch something on yourself, and there are exactly two such switches: linking a card to GitHub, where only the open-or-closed state of that repository&#8217;s issues travels; and agent access, where an AI assistant you chose can read your lines and notes. Struck itself sends them nowhere &#8212; but wherever that assistant runs, they go.</p>
+  </div>
+
+  <h2>Your tasks</h2>
+  <p>Everything you write in Struck is stored in one folder on your Mac: a standard SQLite database file, with any images or video you have clipped to a note saved beside it. <em>There is no sync between devices.</em> Struck has no account, no sign-in, and no server of ours anywhere in the loop, and it never uploads your tasks to us. The exceptions are the two things you switch on yourself, both described below: the GitHub link, one repository per card, and agent access. If general sync is ever added, it will be described here before it ships.</p>
+  <p>Deleting the app and its data folder removes your tasks, your notes and your clips. Two small things sit outside that folder, and only if you linked GitHub: the access token, in your login Keychain under <code>sc.jason.struck.github</code>, and the account name it belongs to, which Struck remembers in its own preferences so Settings can show you which account is connected. Disconnecting GitHub in Settings deletes both.</p>
+  <p>Your tasks are yours in the ordinary sense: the file is a standard SQLite database you can copy, move or back up yourself, and the app keeps working on everything you have already written whether or not you buy it.</p>
+
+  <h2>Analytics and tracking</h2>
+  <p>There are none. Struck contains no analytics, no telemetry, no crash-reporting SDKs, no advertising identifiers, and no third-party code that phones home. If you email us about a problem, whatever you choose to include in that email is the only diagnostic information we ever see.</p>
+
+  <h2>GitHub linking</h2>
+  <p>Linking a card to a GitHub repository is optional and off until you set it up. When you do, you give Struck a token you created yourself; it is kept in your Mac&#8217;s <strong>Keychain</strong> and is sent to exactly one place — <code>api.github.com</code> — as the credential on Struck&#8217;s own requests. It is never sent to us, never written into the app&#8217;s database, and never shared with anything else.</p>
+  <p>While a card is linked, this is the whole of the traffic.</p>
+  <p><strong>Coming down from GitHub:</strong> the number, title, open-or-closed state and <em>opening comment</em> of each issue in that repository &#8212; the opening comment is written into the note on that line &#8212; together with the account name the token belongs to. If the repository is private, be aware that this puts those issue titles and bodies into Struck&#8217;s database on your Mac.</p>
+  <p><strong>Going up to GitHub:</strong> whether an issue is open or closed, and nothing else. Striking a mirrored line closes its issue; unstriking reopens it. Everything else Struck holds against those lines &#8212; your dates and hours, repeats, highlighting, the notes you write yourself, your clips and your ordering &#8212; stays on your Mac and is never sent to GitHub.</p>
+
+  <h2>Agents (MCP)</h2>
+  <p>Struck can let an AI assistant you already use — Claude, or anything that speaks MCP — read and write your cards. <strong>It is off until you turn it on</strong> in Settings &rsaquo; Connections, and while it is off every request is refused.</p>
+  <p>The connector runs entirely on your Mac and is reachable only by software running on it. Struck sends nothing to any AI service itself: what your assistant does with what it reads is governed by <em>your</em> agreement with whoever makes it.</p>
+  <p>An agent can capture lines, read your cards, make cards and sub-lists, strike, unstrike and annotate. <strong>It cannot delete a line, a card or a sub-list</strong> &#8212; the connector has no delete verb. The one thing it can overwrite is a line&#8217;s note: annotating replaces the whole note rather than adding to it.</p>
+  <p>An agent&#8217;s writes land as ordinary marks on your page rather than as tracked actions. They are not visually distinguished from your own, and <kbd>&#8984;Z</kbd> does not reach them &#8212; you reverse one the way you would reverse yourself, by striking, unstriking or rewriting the line. It also means an overwritten note does not come back, which is worth knowing before you point an agent at a card whose notes you care about.</p>
+
+  <h2>Notifications</h2>
+  <p>If you give a task an hour, Struck asks macOS to remind you at that hour. The reminder is scheduled and delivered entirely on your Mac; nothing about it leaves the machine.</p>
+
+  <h2>Buying Struck</h2>
+  <p>Struck is bought through the App Store, so Apple handles the purchase and we never see your payment details — only whether this copy has been paid for.</p>
+
+  <h2>This website</h2>
+  <p>This site is static, sets no cookies, and runs no analytics. It is hosted on GitHub Pages; GitHub may log requests (like any web host) under <a class="link" href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">its own privacy statement</a>.</p>
+
+  <h2>Changes and contact</h2>
+  <p>If this policy ever changes, the new version will be posted here with a new effective date. Questions? <a class="link" href="mailto:hi@jason.sc">hi@jason.sc</a></p>
+
+  <footer>
+    &copy; 2026 Circa75 Media, LLC &middot; <a href="../support/">Support</a>
+  </footer>
+
+</div>
+
+</body>
+</html>

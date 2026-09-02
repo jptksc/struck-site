@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Struck — the to-do app where you cross things out</title>
+<meta name="description" content="A menu-bar to-do app for macOS. No checkboxes — you drag across a task and cross it out yourself. Everything stays on your Mac. $19.99 once, never a subscription.">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta property="og:title" content="Struck — the to-do app where you cross things out">
+<meta property="og:description" content="No checkboxes. You drag across a task and a line of ink follows your hand — the same gesture you'd use on paper. It lives in your Mac's menu bar and never leaves it.">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --paper: #f2e6d3;
+    --glass: rgba(243, 232, 213, 0.78);
+    --ink: #38322a;
+    --ink-40: rgba(56, 50, 42, 0.4);
+    --ink-soft: rgba(56, 50, 42, 0.52);
+    --rule: rgba(56, 50, 42, 0.11);
+    --marker: #a8e43c;
+    --on-marker: #2c3313;
+    --desk1: #e9e1d2;
+    --desk2: #d6cab4;
+    --barglass: rgba(250, 246, 238, 0.62);
+    --btn-ink: #2b2620;
+    --btn-paper: #f7efe1;
+    --bar-h: 30px;
+    --pitch: 46px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0d1311;
+      --glass: rgba(13, 19, 17, 0.68);
+      --ink: #d6e7dd;
+      --ink-40: rgba(214, 231, 221, 0.4);
+      --ink-soft: rgba(214, 231, 221, 0.5);
+      --rule: rgba(214, 231, 221, 0.09);
+      --marker: #2f5f9d;
+      --on-marker: #dce9f7;
+      --desk1: #141a1e;
+      --desk2: #07090c;
+      --barglass: rgba(16, 20, 23, 0.55);
+      --btn-ink: #d6e7dd;
+      --btn-paper: #10161a;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+    background:
+      radial-gradient(120vw 80vh at 78% -10%, rgba(255, 255, 255, 0.16), transparent 60%),
+      linear-gradient(165deg, var(--desk1), var(--desk2));
+    background-attachment: fixed;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 5vw, 48px);
+  }
+
+  /* ---------- macOS menu bar (Struck is a status item; Finder is frontmost) ---------- */
+  .macbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--bar-h);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 clamp(10px, 2.2vw, 16px);
+    background: var(--barglass);
+    backdrop-filter: blur(22px) saturate(1.5);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+    box-shadow: 0 0.5px 0 rgba(0, 0, 0, 0.12);
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--ink);
+    user-select: none;
+  }
+  .macbar .left, .macbar .right { display: flex; align-items: center; gap: 4px; }
+  .macbar .item { padding: 3px 10px; border-radius: 5px; white-space: nowrap; }
+  .macbar .apple { font-size: 15px; padding: 3px 11px; }
+  .macbar .appname { font-weight: 700; }
+  .macbar .lite { display: none; opacity: 0.85; }
+  @media (min-width: 700px) { .macbar .lite { display: block; } }
+  .macbar .clock { font-variant-numeric: tabular-nums; font-weight: 600; }
+  #barGlyph {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 5px;
+    transition: background 0.15s ease;
+  }
+  #barGlyph:hover { background: rgba(127, 127, 127, 0.18); }
+  #barGlyph svg { width: 18px; height: 18px; }
+  #barGlyph .base { stroke: currentColor; stroke-width: 2; stroke-linecap: round; fill: none; }
+  #barGlyph .tickstroke {
+    stroke: currentColor; stroke-width: 2; stroke-linecap: round; fill: none;
+    stroke-dasharray: 20; stroke-dashoffset: 20; opacity: 0;
+  }
+  #barGlyph.tick .tickstroke { animation: microtick 0.7s ease-out; }
+  @keyframes microtick {
+    0% { stroke-dashoffset: 20; opacity: 1; }
+    45% { stroke-dashoffset: 0; opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 0; }
+  }
+
+  /* ---------- hero ---------- */
+  .hero {
+    padding-top: clamp(96px, 16vh, 170px);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(44px, 6vw, 72px);
+    align-items: center;
+  }
+  @media (min-width: 980px) { .hero { grid-template-columns: 1.05fr 0.95fr; } }
+  h1 {
+    font-size: clamp(40px, 6.4vw, 76px);
+    line-height: 1.03;
+    font-weight: 800;
+    letter-spacing: -0.045em;
+    max-width: 13ch;
+  }
+  .sub {
+    margin-top: clamp(16px, 2.4vw, 24px);
+    font-size: clamp(16px, 1.9vw, 19px);
+    line-height: 1.55;
+    color: var(--ink-soft);
+    font-weight: 500;
+    max-width: 44ch;
+  }
+  .dl-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: clamp(24px, 3.4vw, 34px);
+    padding: 14px clamp(22px, 3vw, 26px) 15px;
+    background: var(--btn-ink);
+    color: var(--btn-paper);
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.5);
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .dl-btn:hover { transform: translateY(-2px); box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.5); }
+  .dl-btn:active { transform: translateY(0) scale(0.98); }
+  .dl-btn svg { width: 16px; height: 19px; transform: translateY(-1.8px); }
+  .dl-btn .soon {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(127, 127, 127, 0.28);
+    color: inherit;
+  }
+  .hint {
+    margin-top: clamp(12px, 1.6vw, 16px);
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    line-height: 1.6;
+  }
+  .hint a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--ink-40); }
+  .hint code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12.5px;
+    background: rgba(127, 127, 127, 0.14);
+    padding: 1.5px 6px;
+    border-radius: 5px;
+  }
+
+  .reveal { opacity: 0; transform: translateY(18px); animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+  .reveal.d1 { animation-delay: 0.08s; }
+  .reveal.d2 { animation-delay: 0.18s; }
+  .reveal.d3 { animation-delay: 0.3s; }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+
+  /* ---------- the card ---------- */
+  .cardwrap { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .card {
+    width: min(430px, 100%);
+    border-radius: 16px;
+    background: var(--glass);
+    backdrop-filter: blur(26px) saturate(1.25);
+    -webkit-backdrop-filter: blur(26px) saturate(1.25);
+    box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.45), 0 4px 14px -6px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .card-head { padding: 24px 22px 14px; position: relative; }
+  .card-head h2 { font-size: 26px; font-weight: 700; letter-spacing: -0.03em; }
+  .ruler { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--rule); }
+  .ruler .beam {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 0%;
+    background: linear-gradient(to right, transparent, var(--marker));
+    transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .ruler .beam::after {
+    content: "";
+    position: absolute; inset: -2px 0;
+    background: linear-gradient(to right, transparent, var(--marker));
+    filter: blur(4px);
+    opacity: 0.9;
+  }
+
+  .rows { position: relative; }
+  .row {
+    height: var(--pitch);
+    display: flex;
+    align-items: center;
+    position: relative;
+    border-bottom: 1px solid var(--rule);
+    touch-action: pan-y;
+  }
+  .row:last-child { border-bottom: none; }
+  .row .sigil {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink-40);
+    letter-spacing: 0.05em;
+  }
+  .row .title {
+    margin-left: 30px;
+    position: relative;
+    z-index: 0;
+    display: inline-flex;
+    align-items: baseline;
+    min-width: 0;
+    font-size: 17px;
+    font-weight: 400;
+    letter-spacing: -0.005em;
+  }
+  .row .words {
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: opacity 0.35s ease;
+  }
+  .row.hl .words { color: var(--on-marker); padding: 0 5px; margin: 0 -5px; }
+  .row.hl .words::before {
+    content: "";
+    position: absolute;
+    inset: 1px -4px 2px -4px;
+    background: var(--marker);
+    z-index: -1;
+    border-radius: 2px;
+    filter: url(#rough);
+    transform: rotate(-0.3deg);
+  }
+  .row .note {
+    flex: none;
+    width: 10px; height: 9px;
+    margin-left: 8px;
+    align-self: center;
+    opacity: 0.5;
+  }
+  .row .note line { stroke: var(--ink); stroke-width: 1.1; stroke-linecap: round; }
+  .row .fig {
+    margin-left: auto;
+    padding-left: 12px;
+    padding-right: 18px;
+    flex: none;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-40);
+    font-variant-numeric: tabular-nums;
+    transition: opacity 0.35s ease;
+  }
+  .row.struck .words, .row.struck .fig, .row.struck .sigil, .row.struck .note { opacity: 0.4; }
+  .row.hl .words::before { transition: opacity 0.35s ease; }
+
+  /* blank row: ghost dots + the pen */
+  .row.blank { cursor: text; }
+  .row.blank .ghost {
+    position: absolute;
+    left: 30px; bottom: 13px;
+    display: flex; gap: 5px;
+  }
+  .row.blank .ghost i {
+    width: 3.5px; height: 3.5px;
+    border-radius: 50%;
+    background: var(--ink);
+    opacity: 0;
+  }
+  .row.blank:hover .ghost i, .row.blank.writing .ghost i { animation: dotwave 1.15s ease-out forwards; }
+  .row.blank .ghost i:nth-child(2) { animation-delay: 0.08s; }
+  .row.blank .ghost i:nth-child(3) { animation-delay: 0.16s; }
+  .row.blank.writing .ghost { display: none; }
+  @keyframes dotwave {
+    0% { opacity: 0; transform: translateY(0); }
+    16% { opacity: 1; transform: translateY(-4px); }
+    32% { transform: translateY(0); }
+    48% { transform: translateY(-2.5px); }
+    64% { transform: translateY(0); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  #pen {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    padding: 0 18px 0 30px;
+    background: transparent;
+    border: none;
+    outline: none;
+    font: 400 17px/1 -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    caret-color: var(--ink);
+  }
+  #ink {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .cardhint {
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    text-align: center;
+    max-width: 40ch;
+    line-height: 1.65;
+  }
+  .cardhint code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px;
+    background: rgba(127, 127, 127, 0.14);
+    padding: 1.5px 6px;
+    border-radius: 5px;
+  }
+
+  /* ---------- features ---------- */
+  .features {
+    margin-top: clamp(90px, 15vh, 160px);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(30px, 4vw, 44px) clamp(40px, 6vw, 80px);
+  }
+  @media (min-width: 760px) { .features { grid-template-columns: 1fr 1fr; } }
+  .feature h3 {
+    font-size: clamp(18px, 2vw, 21px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 7px;
+  }
+  .feature p {
+    font-size: 15.5px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    font-weight: 450;
+    max-width: 52ch;
+  }
+  .feature p strong { color: var(--ink); font-weight: 600; }
+  .specimen {
+    margin-top: 12px;
+    font-size: 16px;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    background: var(--glass);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-radius: 10px;
+    padding: 13px 16px;
+    box-shadow: 0 8px 22px -14px rgba(0, 0, 0, 0.4);
+    white-space: nowrap;
+    overflow-x: auto;
+  }
+  .specimen .tok { font-style: normal; color: var(--ink-40); }
+
+  /* ---------- CTA + footer ---------- */
+  .cta { margin-top: clamp(90px, 15vh, 160px); }
+  .cta h2 {
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    max-width: 18ch;
+    line-height: 1.1;
+  }
+  footer {
+    margin-top: clamp(70px, 10vh, 110px);
+    padding: clamp(20px, 3vw, 32px) 0 clamp(40px, 6vw, 56px);
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    line-height: 1.9;
+  }
+  footer strong { color: var(--ink); font-weight: 600; }
+  footer .legal { margin-top: 14px; font-size: 12.5px; opacity: 0.85; }
+  footer .legal a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--ink-40); }
+  footer .legal a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { animation: none; opacity: 1; transform: none; }
+    .row.blank:hover .ghost i, .row.blank.writing .ghost i { animation: none; opacity: 1; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="rough">
+    <feTurbulence type="fractalNoise" baseFrequency="0.018 0.32" numOctaves="2" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="3.5"/>
+  </filter>
+</svg>
+
+<nav class="macbar" aria-label="Menu bar">
+  <div class="left">
+    <span class="item apple"></span>
+    <span class="item appname">Finder</span>
+    <span class="item lite">File</span>
+    <span class="item lite">Edit</span>
+    <span class="item lite">View</span>
+    <span class="item lite">Go</span>
+    <span class="item lite">Window</span>
+    <span class="item lite">Help</span>
+  </div>
+  <div class="right">
+    <span class="item" id="barGlyph" title="Struck">
+      <svg viewBox="0 0 18 18" aria-hidden="true">
+        <path class="base" d="M2.5 10.2 C 6 8.9, 9.5 9.9, 12 9.1 S 15 8.6, 15.5 8.8"/>
+        <path class="tickstroke" d="M2.5 10.2 C 6 8.9, 9.5 9.9, 12 9.1 S 15 8.6, 15.5 8.8"/>
+      </svg>
+    </span>
+    <span class="item clock" id="clock">Sun 9:41</span>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <section class="hero">
+    <div>
+      <h1 class="reveal">The to&#8209;do app where you cross things out.</h1>
+      <p class="sub reveal d1">No checkboxes. You drag across a task and a line of ink follows your hand — the same gesture you&#8217;d use on paper. Struck lives in your Mac&#8217;s menu&nbsp;bar, one keystroke from whatever you&#8217;re working on.</p>
+      <a class="dl-btn reveal d2" href="#card" id="dlTop">
+        <svg viewBox="0 0 16 19" fill="currentColor" aria-hidden="true"><path d="M13.1 10.1c0-2 1.7-3 1.8-3.1-1-1.4-2.5-1.6-3-1.6-1.3-.1-2.5.8-3.2.8-.7 0-1.7-.8-2.8-.8C4.5 5.4 3.1 6.2 2.3 7.5.7 10.2 1.9 14.2 3.4 16.4c.8 1.1 1.7 2.3 2.8 2.3 1.1 0 1.6-.7 2.9-.7 1.3 0 1.7.7 2.9.7 1.2 0 2-1.1 2.7-2.2.9-1.2 1.2-2.4 1.2-2.5 0 0-2.8-1-2.8-3.9zM10.9 3.3c.6-.7 1-1.7.9-2.7-.9 0-1.9.6-2.5 1.3-.6.6-1 1.6-.9 2.6 1 .1 1.9-.5 2.5-1.2z"/></svg>
+        Download for Mac
+        <span class="soon">soon</span>
+      </a>
+      <p class="hint reveal d3">Coming to the Mac App Store for macOS&nbsp;14+. Free for two weeks, then <strong>$19.99 once</strong> — never a subscription.<br>Want to know the day it ships? <a href="mailto:hi@jason.sc?subject=Struck">hi@jason.sc</a></p>
+    </div>
+
+    <div class="cardwrap reveal d2" id="card">
+      <div class="card" id="theCard">
+        <header class="card-head">
+          <h2>Today</h2>
+          <div class="ruler"><i class="beam" id="beam"></i></div>
+        </header>
+        <div class="rows" id="rows">
+          <div class="row" aria-hidden="true"></div>
+          <div class="row task" data-task><span class="title"><span class="words">Ship the beta</span></span><span class="fig">friday</span></div>
+          <div class="row task hl" data-task><span class="title"><span class="words">Cross out something important</span></span></div>
+          <div class="row task struck" data-task data-prestruck><span class="title"><span class="words">Install a to-do app that nags you</span></span></div>
+          <div class="row task" data-task><span class="title"><span class="words">Book the studio for the mixes</span><svg class="note" viewBox="0 0 10 9" aria-hidden="true"><line x1="0.5" y1="1.5" x2="9.5" y2="1.5"/><line x1="0.5" y1="4.5" x2="9.5" y2="4.5"/><line x1="0.5" y1="7.5" x2="6.5" y2="7.5"/></svg></span><span class="fig">sep 2</span></div>
+          <div class="row task" data-task><span class="sigil">..</span><span class="title"><span class="words">Water the ficus</span></span></div>
+          <div class="row blank" id="blankRow">
+            <span class="ghost" aria-hidden="true"><i></i><i></i><i></i></span>
+            <input id="pen" type="text" autocomplete="off" spellcheck="false" enterkeyhint="done" aria-label="Write a task" style="opacity:0">
+          </div>
+          <div class="row bare" aria-hidden="true"></div>
+          <canvas id="ink"></canvas>
+        </div>
+      </div>
+      <p class="cardhint">It&#8217;s real ink — drag across a line to strike it, drag backward to take it off. The last row takes writing: try <code>Call mom &gt;friday !!</code></p>
+    </div>
+  </section>
+
+  <section class="features" aria-label="What Struck is">
+    <div class="feature">
+      <h3>Done is a gesture, not a checkbox</h3>
+      <p>Drag across a line and the ink lays down as far as you&#8217;ve crossed &#8212; a nib-width mark with a hand&#8217;s wobble in it, and past a point it finishes the stroke for you. <strong>The line then rests at 40% ink with the mark through it</strong>, exactly where you drew it, sitting among the live lines rather than dropping into an archive you&#8217;ll never open. Drag back to take it off.</p>
+    </div>
+    <div class="feature">
+      <h3>Two keys are the whole interface</h3>
+      <p>No Dock icon, no window to manage, nothing to launch. <strong>&#8997;Space</strong> gives you one line to write on from inside any app &#8212; type, hit return, it&#8217;s gone. <strong>&#8997;&#8679;Space</strong> opens the full page, exactly where you left it.</p>
+    </div>
+    <div class="feature">
+      <h3>Type the details, don&#8217;t click them</h3>
+      <p>A date, an hour, a repeat, a priority and a filing all fit inside the sentence you were already writing. Tokens dim as Struck recognises them; press return and they disappear, leaving small marks in the margin. Anything it can&#8217;t read stays in your title at full ink &#8212; nothing is silently dropped.</p>
+      <div class="specimen">Master the interlude <i class="tok">&gt;friday</i> <i class="tok">&gt;2pm</i> <i class="tok">!!</i> <i class="tok">..1w</i> <i class="tok">@Studio</i></div>
+    </div>
+    <div class="feature">
+      <h3>Nothing ever turns red</h3>
+      <p>No badges, no counts, no progress rings, and <strong>no overdue state, anywhere</strong>. A task you keep carrying simply presses a little harder into the page each day. Age shows up as ink, not as an alarm.</p>
+    </div>
+    <div class="feature">
+      <h3>One card at a time</h3>
+      <p>An Inbox for whatever&#8217;s unfiled, Upcoming for everything with a date, and a card for each area of your life. Only one is on screen, ever. <strong>&#8984;1&#8211;9</strong> deals a card straight to the top; <strong>&#8984;&#8592;</strong> and <strong>&#8984;&#8594;</strong> walk the deck.</p>
+    </div>
+    <div class="feature">
+      <h3>Every line has a back</h3>
+      <p>Press <strong>&#8984;&#8217;</strong> and the card turns over onto the same ruled paper. Write as long as you like; clip images and video against a line and they fan out in the margin like prints on a desk. There is no save button, because there is no way to lose one.</p>
+    </div>
+    <div class="feature">
+      <h3>Paper you mix yourself</h3>
+      <p>A card is a pane of tinted glass over your desktop, and its ink is derived from its paper so it stays legible over any wallpaper you own. Four levers &#8212; saturation, colour, tone, highlighter &#8212; mix the stock, and any card can wear its own.</p>
+    </div>
+    <div class="feature">
+      <h3>It never leaves your Mac</h3>
+      <p>Everything you write lives in one folder on your Mac &#8212; a plain SQLite file with whatever you&#8217;ve clipped sitting beside it, yours to copy or back up like any other. <strong>No account, no sign-in, no server of ours, nothing uploaded.</strong> It works offline because it has never been anywhere else. The only thing Struck itself ever sends anywhere is the open-or-closed state of an issue on a card you deliberately linked to GitHub &#8212; and if you switch on agent access below, whatever your assistant reads goes wherever that assistant runs.</p>
+    </div>
+    <div class="feature">
+      <h3>$19.99, once</h3>
+      <p>Free for two weeks, then a single purchase in the Mac App Store. No subscription, no tiers, no account to cancel. And when a trial ends Struck doesn&#8217;t lock you out of your own notebook &#8212; everything already written stays there to read, strike, edit and rearrange. <strong>What runs dry is writing new lines and making new cards.</strong></p>
+    </div>
+    <div class="feature">
+      <h3>A card can watch a repo</h3>
+      <p>Point a card at a GitHub repository and its open issues arrive as lines on it. Strike one and the issue closes; close one on GitHub and it&#8217;s already struck here next time you look. Optional, off until you set it up, and it runs on a token you make yourself.</p>
+    </div>
+    <div class="feature">
+      <h3>Let an agent write on it</h3>
+      <p>Struck speaks MCP, so Claude &#8212; or anything else that speaks it &#8212; can read and write your cards in exactly the grammar you type. Off until you turn it on. It can capture, file, strike, unstrike and annotate, and <strong>it cannot delete a line, a card or a list</strong> &#8212; there is no delete verb to give it. An agent&#8217;s marks are ordinary marks: you strike, unstrike or rewrite them exactly as you would your own.</p>
+    </div>
+  </section>
+
+  <section class="cta">
+    <h2>Made for the small pleasure of crossing it out.</h2>
+    <a class="dl-btn" href="mailto:hi@jason.sc?subject=Struck">
+      <svg viewBox="0 0 16 19" fill="currentColor" aria-hidden="true"><path d="M13.1 10.1c0-2 1.7-3 1.8-3.1-1-1.4-2.5-1.6-3-1.6-1.3-.1-2.5.8-3.2.8-.7 0-1.7-.8-2.8-.8C4.5 5.4 3.1 6.2 2.3 7.5.7 10.2 1.9 14.2 3.4 16.4c.8 1.1 1.7 2.3 2.8 2.3 1.1 0 1.6-.7 2.9-.7 1.3 0 1.7.7 2.9.7 1.2 0 2-1.1 2.7-2.2.9-1.2 1.2-2.4 1.2-2.5 0 0-2.8-1-2.8-3.9zM10.9 3.3c.6-.7 1-1.7.9-2.7-.9 0-1.9.6-2.5 1.3-.6.6-1 1.6-.9 2.6 1 .1 1.9-.5 2.5-1.2z"/></svg>
+      Email me when it ships
+    </a>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <strong>One sheet on a desk, not another window.</strong><br>
+    Quiet by default &middot; macOS 14+ &middot; $19.99 once
+    <p class="legal">&copy; 2026 Circa75 Media, LLC &middot; <a href="support/">Support</a> &middot; <a href="privacy/">Privacy</a></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- clock ---------- */
+  var clock = document.getElementById("clock");
+  function tickClock() {
+    var d = new Date();
+    var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    var h = d.getHours() % 12 || 12;
+    clock.textContent = days[d.getDay()] + " " + h + ":" + String(d.getMinutes()).padStart(2, "0");
+  }
+  tickClock();
+  setInterval(tickClock, 15000);
+
+  /* ---------- card + canvas ---------- */
+  var rows = document.getElementById("rows");
+  var canvas = document.getElementById("ink");
+  var ctx = canvas.getContext("2d");
+  var beam = document.getElementById("beam");
+  var barGlyph = document.getElementById("barGlyph");
+  var blankRow = document.getElementById("blankRow");
+  var pen = document.getElementById("pen");
+  var dpr = 1;
+
+  function inkColor() {
+    return getComputedStyle(document.body).getPropertyValue("--ink").trim() || "#38322a";
+  }
+
+  function sizeCanvas() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = rows.clientWidth * dpr;
+    canvas.height = rows.clientHeight * dpr;
+    canvas.style.width = rows.clientWidth + "px";
+    canvas.style.height = rows.clientHeight + "px";
+  }
+
+  /* smooth two-octave wobble, deterministic per seed */
+  function wob(seed, x) {
+    return Math.sin(x * 0.085 + seed * 7.31) * 0.55 +
+           Math.sin(x * 0.023 + seed * 3.17) * 0.85 +
+           Math.sin(x * 0.19 + seed * 11.7) * 0.22;
+  }
+
+  /* geometry of a task row, relative to .rows */
+  function geo(row) {
+    var rr = rows.getBoundingClientRect();
+    var r = row.getBoundingClientRect();
+    var words = row.querySelector(".words");
+    var w = words.getBoundingClientRect();
+    return {
+      top: r.top - rr.top,
+      cy: r.top - rr.top + r.height / 2 + 1,
+      wl: w.left - rr.left,
+      ww: Math.max(20, w.width)
+    };
+  }
+
+  /* persisted strokes: row -> {seed, pts:[{u, dy, w}]} */
+  var strokes = new Map();
+  var taskRows = function () {
+    return Array.prototype.slice.call(rows.querySelectorAll(".row.task"));
+  };
+
+  function drawRibbon(pts, alpha, color) {
+    if (pts.length < 2) return;
+    ctx.beginPath();
+    var i, p;
+    for (i = 0; i < pts.length; i++) {
+      p = pts[i];
+      var y = p.y - p.w / 2 + wob(p.seed + 1, p.x) * 0.45;
+      if (i === 0) ctx.moveTo(p.x * dpr, y * dpr);
+      else ctx.lineTo(p.x * dpr, y * dpr);
+    }
+    for (i = pts.length - 1; i >= 0; i--) {
+      p = pts[i];
+      ctx.lineTo(p.x * dpr, (p.y + p.w / 2 + wob(p.seed + 2, p.x) * 0.45) * dpr);
+    }
+    ctx.closePath();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  function pixelPts(row, s) {
+    var g = geo(row);
+    return s.pts.map(function (p) {
+      return { x: g.wl + p.u * g.ww, y: g.cy + p.dy + wob(s.seed, g.wl + p.u * g.ww) * 1.1, w: p.w, seed: s.seed };
+    });
+  }
+
+  var active = null;        /* the stroke being drawn */
+  var transients = [];      /* strokes mid-animation (completing or retracting) */
+  var animations = [];      /* running stroke animations */
+  var particles = [];       /* burst discs */
+  var rafId = null;
+  var lastFrame = 0;
+
+  function redraw(now) {
+    rafId = null;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    var color = inkColor();
+
+    strokes.forEach(function (s, row) {
+      if (s.hidden) return;
+      var pts = pixelPts(row, s);
+      if (s.trim != null) pts = pts.slice(0, Math.max(2, Math.round(pts.length * s.trim)));
+      drawRibbon(pts, 0.55, color);
+    });
+
+    if (active && active.pts.length > 1) drawRibbon(active.pts, 0.9, color);
+    for (var ti = 0; ti < transients.length; ti++) {
+      if (transients[ti].pts.length > 1) drawRibbon(transients[ti].pts, 0.9, color);
+    }
+
+    /* particles */
+    if (particles.length) {
+      var dt = lastFrame ? Math.min(now - lastFrame, 40) : 16;
+      var alive = [];
+      for (var i = 0; i < particles.length; i++) {
+        var p = particles[i];
+        if (!p.born) p.born = now;
+        p.life = now - p.born;      /* wall clock, so throttled tabs don't replay old bursts */
+        if (p.life >= p.ttl) continue;
+        var damp = Math.exp(-p.k * dt);
+        p.vx *= damp; p.vy *= damp;
+        p.vy += p.g * dt;
+        p.x += p.vx * dt; p.y += p.vy * dt;
+        var a = p.life > p.ttl * 0.6 ? 1 - (p.life - p.ttl * 0.6) / (p.ttl * 0.4) : 1;
+        ctx.globalAlpha = a * 0.9;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(p.x * dpr, p.y * dpr, p.r * dpr, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        alive.push(p);
+      }
+      particles = alive;
+    }
+    lastFrame = now;
+
+    /* stroke animations */
+    var keep = [];
+    for (var j = 0; j < animations.length; j++) {
+      if (animations[j](now)) keep.push(animations[j]);
+    }
+    animations = keep;
+
+    if (active || particles.length || animations.length) frame();
+  }
+  function frame() {
+    if (!rafId) rafId = requestAnimationFrame(redraw);
+  }
+
+  /* ---------- ruler + menu glyph ---------- */
+  function updateBeam() {
+    var all = taskRows();
+    var struck = all.filter(function (r) { return r.classList.contains("struck"); }).length;
+    beam.style.width = all.length ? (struck / all.length * 100) + "%" : "0%";
+  }
+
+  function microTick() {
+    barGlyph.classList.remove("tick");
+    void barGlyph.offsetWidth;
+    barGlyph.classList.add("tick");
+  }
+
+  /* ---------- burst: the page's own ink coming apart in the air ---------- */
+  function burst(x, y) {
+    if (reduced) return;
+    var n = 22;
+    for (var i = 0; i < n; i++) {
+      var a = Math.random() * Math.PI * 2;
+      var sp = (0.22 + Math.random() * 0.18);            /* px per ms: 220-400 pt/s */
+      particles.push({
+        x: x + (Math.random() - 0.5) * 3,
+        y: y + (Math.random() - 0.5) * 3,
+        vx: Math.cos(a) * sp,
+        vy: Math.sin(a) * sp * 0.88,
+        g: 0.00115,
+        k: 0.0042,
+        r: 1.3 + Math.random() * 1.6,
+        life: 0,
+        ttl: 700 + Math.random() * 250
+      });
+    }
+    frame();
+  }
+
+  /* ---------- completing / retracting / unstriking ---------- */
+  function persistStroke(row, stroke) {
+    var g = geo(row);
+    var s = { seed: stroke.seed, pts: [] };
+    for (var i = 0; i < stroke.pts.length; i++) {
+      var p = stroke.pts[i];
+      s.pts.push({ u: (p.x - g.wl) / g.ww, dy: p.y - g.cy - wob(stroke.seed, p.x) * 1.1, w: p.w });
+    }
+    strokes.set(row, s);
+  }
+  function dropTransient(s) {
+    var i = transients.indexOf(s);
+    if (i >= 0) transients.splice(i, 1);
+  }
+
+  function completeStrike(row) {
+    var g = geo(row);
+    var last = active.pts[active.pts.length - 1];
+    var startX = last.x, startY = last.y, startW = last.w;
+    var target = g.wl + g.ww + 5;
+    var myStroke = active;
+    active = null; /* handed to the animation */
+    transients.push(myStroke);
+    var t0 = performance.now();
+    var D1 = reduced ? 0 : 130, D2 = reduced ? 0 : 90;
+
+    function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+    animations.push(function (now) {
+      var t = now - t0;
+      var x;
+      if (t < D1) {
+        x = startX + (target + 4 - startX) * ease(t / D1);
+      } else if (t < D1 + D2) {
+        x = target + 4 - 4 * ((t - D1) / D2);
+      } else {
+        x = target;
+      }
+      /* rebuild the extension tail */
+      while (myStroke.pts.length && myStroke.pts[myStroke.pts.length - 1].ext) myStroke.pts.pop();
+      var steps = Math.max(2, Math.round((x - startX) / 5));
+      for (var i = 1; i <= steps; i++) {
+        var f = i / steps;
+        var px = startX + (x - startX) * f;
+        myStroke.pts.push({
+          x: px,
+          y: startY + (g.cy - startY) * f + wob(myStroke.seed, px) * 1.1,
+          w: Math.max(1.6, startW * (1 - f * 0.25)),
+          seed: myStroke.seed,
+          ext: true
+        });
+      }
+      if (t >= D1 + D2) {
+        dropTransient(myStroke);
+        persistStroke(row, myStroke);
+        row.classList.add("struck");
+        updateBeam();
+        microTick();
+        burst(target, g.cy);
+        frame();
+        return false;
+      }
+      return true;
+    });
+    frame();
+  }
+
+  function retractStrike() {
+    var myStroke = active;
+    active = null;
+    transients.push(myStroke);
+    var t0 = performance.now();
+    var n = myStroke.pts.length;
+    var D = reduced ? 0 : 200;
+    animations.push(function (now) {
+      var f = D ? Math.min(1, (now - t0) / D) : 1;
+      myStroke.pts.length = Math.max(0, Math.round(n * (1 - f)));
+      if (f >= 1) { dropTransient(myStroke); return false; }
+      return true;
+    });
+    frame();
+  }
+
+  function unstrike(row) {
+    var s = strokes.get(row);
+    if (!s) { row.classList.remove("struck"); updateBeam(); return; }
+    var t0 = performance.now();
+    var D = reduced ? 0 : 240;
+    animations.push(function (now) {
+      var f = D ? Math.min(1, (now - t0) / D) : 1;
+      s.trim = 1 - f;
+      if (f >= 1) {
+        strokes.delete(row);
+        row.classList.remove("struck");
+        updateBeam();
+        return false;
+      }
+      return true;
+    });
+    frame();
+  }
+
+  /* ---------- gesture: the axis is the verb ---------- */
+  var pending = null;
+  rows.addEventListener("pointerdown", function (e) {
+    if (e.button !== 0 && e.pointerType === "mouse") return;
+    var row = e.target.closest ? e.target.closest(".row.task") : null;
+    if (!row || !rows.contains(row)) return;
+    pending = { row: row, x: e.clientX, y: e.clientY, id: e.pointerId };
+  });
+
+  rows.addEventListener("pointermove", function (e) {
+    if (pending && e.pointerId === pending.id) {
+      var dx = e.clientX - pending.x, dy = e.clientY - pending.y;
+      if (Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+      var row = pending.row;
+      if (Math.abs(dy) > Math.abs(dx)) { pending = null; return; }   /* vertical: not ours */
+      var struck = row.classList.contains("struck");
+      if (struck) {
+        if (dx < 0) unstrike(row);                                    /* backward strike takes it off */
+        pending = null;
+        return;
+      }
+      /* begin the stroke */
+      var rr = rows.getBoundingClientRect();
+      var g = geo(row);
+      rows.setPointerCapture(e.pointerId);
+      active = {
+        row: row,
+        seed: Math.random() * 100,
+        g: g,
+        rr: rr,
+        pts: [],
+        minX: e.clientX - rr.left,
+        maxX: e.clientX - rr.left,
+        lastX: pending.x - rr.left,
+        lastY: pending.y - rr.top,
+        lastT: e.timeStamp,
+        w: 3.2
+      };
+      /* the stroke starts where the press landed, not where the first move fired */
+      active.pts.push({ x: active.lastX, y: g.cy + wob(active.seed, active.lastX) * 1.1, w: 3.2, seed: active.seed });
+      active.minX = Math.min(active.minX, active.lastX);
+      active.maxX = Math.max(active.maxX, active.lastX);
+      addPoint(e);
+      pending = null;
+      frame();
+      return;
+    }
+    if (active && rows.hasPointerCapture && rows.hasPointerCapture(e.pointerId)) {
+      addPoint(e);
+      frame();
+    }
+  });
+
+  function addPoint(e) {
+    var rr = active.rr, g = active.g;
+    var x = e.clientX - rr.left;
+    var yRaw = e.clientY - rr.top;
+    if (Math.abs(x - active.lastX) < 2 && active.pts.length) return;
+    var dt = Math.max(1, e.timeStamp - active.lastT);
+    var v = Math.hypot(x - active.lastX, yRaw - active.lastY) / dt;   /* px/ms */
+    var targetW = Math.max(1.4, Math.min(5, 3.4 * (1.35 - Math.min(v, 2.4) * 0.42)));
+    active.w += (targetW - active.w) * 0.3;                            /* smoothed nib */
+    var y = g.cy + Math.max(-8, Math.min(8, (yRaw - g.cy) * 0.35)) + wob(active.seed, x) * 1.1;
+    active.pts.push({ x: x, y: y, w: active.w, seed: active.seed });
+    active.minX = Math.min(active.minX, x);
+    active.maxX = Math.max(active.maxX, x);
+    active.lastX = x; active.lastY = yRaw; active.lastT = e.timeStamp;
+  }
+
+  function endGesture(e) {
+    pending = null;
+    if (!active) return;
+    if (rows.hasPointerCapture && rows.hasPointerCapture(e.pointerId)) rows.releasePointerCapture(e.pointerId);
+    var covered = (active.maxX - active.minX) / active.g.ww;
+    if (covered >= 0.55) completeStrike(active.row);
+    else retractStrike();
+  }
+  rows.addEventListener("pointerup", endGesture);
+  rows.addEventListener("pointercancel", endGesture);
+
+  /* ---------- pre-struck line: a mark that was already made ---------- */
+  function synthStroke(row) {
+    var seed = Math.random() * 100;
+    var s = { seed: seed, pts: [] };
+    for (var u = -0.01; u <= 1.015; u += 0.03) {
+      s.pts.push({ u: u, dy: Math.sin(u * 5.1 + seed) * 1.4, w: 2.4 + Math.sin(u * 9 + seed * 2) * 0.7 });
+    }
+    strokes.set(row, s);
+  }
+
+  /* ---------- the blank row: writing ---------- */
+  function focusPen() { pen.focus(); }
+  blankRow.addEventListener("click", focusPen);
+  rows.addEventListener("click", function (e) {
+    var bare = e.target.closest ? e.target.closest(".row.bare") : null;
+    if (bare) focusPen();
+  });
+  pen.addEventListener("focus", function () { blankRow.classList.add("writing"); pen.style.opacity = 1; });
+  pen.addEventListener("blur", function () {
+    if (!pen.value) { blankRow.classList.remove("writing"); pen.style.opacity = 0; }
+  });
+  pen.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { pen.value = ""; pen.blur(); }
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    commitLine(pen.value);
+    pen.value = "";
+  });
+
+  var DAYS = {
+    today: "today", tod: "today", tomorrow: "tomorrow", tom: "tomorrow",
+    monday: "monday", mon: "monday", tuesday: "tuesday", tue: "tuesday", tues: "tuesday",
+    wednesday: "wednesday", wed: "wednesday", thursday: "thursday", thu: "thursday", thur: "thursday", thurs: "thursday",
+    friday: "friday", fri: "friday", saturday: "saturday", sat: "saturday", sunday: "sunday", sun: "sunday"
+  };
+  var SHORT = { today: "tod", tomorrow: "tom", monday: "mon", tuesday: "tue", wednesday: "wed", thursday: "thu", friday: "fri", saturday: "sat", sunday: "sun" };
+  var MONTHS = { jan: 1, feb: 1, mar: 1, apr: 1, may: 1, jun: 1, jul: 1, aug: 1, sep: 1, oct: 1, nov: 1, dec: 1 };
+
+  function commitLine(raw) {
+    var important = false, day = null, hour = null, repeat = false, area = null;
+    var title = String(raw);
+
+    title = title.replace(/(^|\s)!!(?=\s|$)/g, function (m, sp) { important = true; return sp; });
+    title = title.replace(/(^|\s)\.\.(\d+[dwmy]?|[dwmy])?(?=\s|$)/g, function (m, sp) { repeat = true; return sp; });
+    title = title.replace(/(^|\s)>(\S+)/g, function (m, sp, tok) {
+      var t = tok.toLowerCase();
+      if (DAYS[t]) { day = DAYS[t]; return sp; }
+      if (/^\d{1,2}(:\d{2})?(am|pm)$/.test(t) || /^\d{1,2}:\d{2}$/.test(t) || t === "noon" || t === "midnight") { hour = t; return sp; }
+      var md = t.match(/^([a-z]{3,9})(\d{1,2})$/);
+      if (md && MONTHS[md[1].slice(0, 3)]) { day = md[1].slice(0, 3) + " " + md[2]; return sp; }
+      return m;   /* an unparseable token stays in the title, at full ink */
+    });
+    title = title.replace(/(^|\s)[@#](\S+)/g, function (m, sp, name) { area = name; return sp; });
+    title = title.replace(/\s+/g, " ").trim();
+    if (!title) return;
+
+    var fig = null;
+    if (day) fig = hour ? (SHORT[day] || day) + ", " + hour : day;
+    else if (hour) fig = hour;
+    else if (area) fig = area;
+
+    var row = document.createElement("div");
+    row.className = "row task" + (important ? " hl" : "");
+    row.setAttribute("data-task", "");
+    var h = "";
+    if (repeat) h += '<span class="sigil">..</span>';
+    h += '<span class="title"><span class="words"></span></span>';
+    if (fig) h += '<span class="fig"></span>';
+    row.innerHTML = h;
+    row.querySelector(".words").textContent = title;
+    if (fig) row.querySelector(".fig").textContent = fig;
+    rows.insertBefore(row, blankRow);
+    sizeCanvas();
+    updateBeam();
+    frame();
+  }
+
+  /* ---------- boot ---------- */
+  function boot() {
+    sizeCanvas();
+    taskRows().forEach(function (r) {
+      if (r.hasAttribute("data-prestruck")) synthStroke(r);
+    });
+    updateBeam();
+    frame();
+  }
+  boot();
+
+  var rsTimer;
+  window.addEventListener("resize", function () {
+    clearTimeout(rsTimer);
+    rsTimer = setTimeout(function () { sizeCanvas(); frame(); }, 120);
+  });
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () { frame(); });
+
+  barGlyph.addEventListener("click", function () {
+    document.getElementById("card").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" });
+  });
+})();
+</script>
+
+</body>
+</html>

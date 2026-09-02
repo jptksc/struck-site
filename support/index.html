@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Support — Struck</title>
+<meta name="description" content="Help, answers, and contact details for Struck, the menu-bar to-do app for macOS where you cross things out.">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<style>
+  :root {
+    --paper: #f2e6d3;
+    --glass: rgba(243, 232, 213, 0.78);
+    --ink: #38322a;
+    --ink-40: rgba(56, 50, 42, 0.4);
+    --ink-soft: rgba(56, 50, 42, 0.55);
+    --rule: rgba(56, 50, 42, 0.11);
+    --marker: #a8e43c;
+    --desk1: #e9e1d2;
+    --desk2: #d6cab4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0d1311;
+      --glass: rgba(13, 19, 17, 0.68);
+      --ink: #d6e7dd;
+      --ink-40: rgba(214, 231, 221, 0.4);
+      --ink-soft: rgba(214, 231, 221, 0.55);
+      --rule: rgba(214, 231, 221, 0.1);
+      --marker: #2f5f9d;
+      --desk1: #141a1e;
+      --desk2: #07090c;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+    background: linear-gradient(165deg, var(--desk1), var(--desk2));
+    background-attachment: fixed;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.65;
+  }
+  .wrap {
+    max-width: 660px;
+    margin: 0 auto;
+    padding: clamp(48px, 9vw, 96px) clamp(20px, 5vw, 48px) clamp(56px, 8vw, 88px);
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-decoration: none;
+    margin-bottom: clamp(28px, 5vw, 44px);
+    transition: color 0.2s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .back:hover { color: var(--ink); transform: translateX(-2px); }
+  .back svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+  h1 { font-size: clamp(36px, 6vw, 56px); line-height: 1.05; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 10px; }
+  .sub { color: var(--ink-soft); font-size: 15.5px; font-weight: 500; margin-bottom: clamp(30px, 5vw, 44px); }
+
+  .contact {
+    padding: 22px 26px;
+    border-radius: 16px;
+    background: var(--glass);
+    backdrop-filter: blur(20px) saturate(1.2);
+    -webkit-backdrop-filter: blur(20px) saturate(1.2);
+    box-shadow: 0 14px 34px -18px rgba(0, 0, 0, 0.4);
+    margin-bottom: clamp(30px, 5vw, 42px);
+  }
+  .contact strong { font-size: clamp(18px, 2.2vw, 21px); font-weight: 700; letter-spacing: -0.02em; display: block; margin-bottom: 4px; }
+  .contact p { font-size: 15px; margin: 0; color: var(--ink-soft); }
+  .contact a, a.link { color: var(--ink); font-weight: 600; text-decoration: none; border-bottom: 1.5px solid var(--marker); }
+
+  h2 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 38px 0 14px;
+  }
+  h3 { font-size: 16.5px; font-weight: 650; letter-spacing: -0.01em; margin: 22px 0 4px; }
+  p { font-size: 16px; margin-bottom: 12px; }
+  p, li { color: var(--ink); }
+  code, kbd {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13.5px;
+    background: rgba(127, 127, 127, 0.14);
+    padding: 2px 6px;
+    border-radius: 5px;
+  }
+
+  table.grammar { width: 100%; border-collapse: collapse; margin: 10px 0 4px; }
+  table.grammar td { padding: 8px 10px 8px 0; border-bottom: 1px solid var(--rule); font-size: 15px; vertical-align: top; }
+  table.grammar td:first-child { white-space: nowrap; width: 1%; padding-right: 22px; }
+  table.grammar tr:last-child td { border-bottom: none; }
+  .dim { color: var(--ink-soft); }
+
+  .req { display: flex; gap: 10px; flex-wrap: wrap; margin: 6px 0 0; padding: 0; list-style: none; }
+  .req li {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(127, 127, 127, 0.12);
+    color: var(--ink-soft);
+  }
+
+  footer {
+    margin-top: clamp(40px, 6vw, 60px);
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+  footer a { color: inherit; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <a class="back" href="../">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+    Struck
+  </a>
+
+  <h1>Support</h1>
+  <p class="sub">Help and answers for Struck, the menu-bar to-do app for macOS where you cross things out.</p>
+
+  <div class="contact">
+    <strong>Need a hand?</strong>
+    <p>Email <a href="mailto:hi@jason.sc">hi@jason.sc</a> — questions, bug reports and ideas all welcome. Struck is made by one person, and that person answers the mail, usually within a couple of days.</p>
+  </div>
+
+  <h2>Getting started</h2>
+
+  <h3>The two keys</h3>
+  <p>Struck lives in your menu bar &#8212; there&#8217;s no Dock icon and no window to manage. There are two ways in, and they do different jobs:</p>
+  <table class="grammar">
+    <tr><td><kbd>&#8997;Space</kbd></td><td>one line to write on, over whatever app you&#8217;re in &#8212; type, press return, it&#8217;s gone</td></tr>
+    <tr><td><kbd>&#8997;&#8679;Space</kbd></td><td>the full page, on the card you left it on</td></tr>
+  </table>
+  <p class="dim" style="font-size: 14px;">Clicking the strike mark in the menu bar opens the page too. Either key puts what it opened away again, and both can be re-recorded in Settings.</p>
+
+  <h3>Writing a task</h3>
+  <p>Click any blank ruled row and type. Details ride along in the line itself &#8212; tokens dim as they&#8217;re recognised, and when you hit return they vanish, leaving marks:</p>
+  <table class="grammar">
+    <tr><td><code>&gt;friday</code></td><td>due friday &#8212; also <span class="dim">&gt;today, &gt;tomorrow, &gt;aug15</span></td></tr>
+    <tr><td><code>&gt;8:30am</code></td><td>an hour, riding behind its day &#8212; and a quiet reminder at it</td></tr>
+    <tr><td><code>!!</code></td><td>important &#8212; draws the highlighter across the line</td></tr>
+    <tr><td><code>..1w</code></td><td>repeats &#8212; the next one comes due a week on from this one</td></tr>
+    <tr><td><code>@Errands</code></td><td>files the line into an area</td></tr>
+    <tr><td><code>#Gear</code></td><td>files it into a sub-list of the area you&#8217;re on</td></tr>
+  </table>
+  <p class="dim" style="font-size: 14px;">A token Struck can&#8217;t parse stays in the title at full ink &#8212; nothing is ever silently dropped.</p>
+
+  <h3>Striking</h3>
+  <p>Drag across the words. The ink follows your hand; past a point it finishes the stroke for you, and the line settles to 40% ink exactly where you crossed it. Drag back across a struck line to take the mark off. Editing is just clicking a line &#8212; it opens with its marks written back in, as the same tokens you&#8217;d have typed to make it.</p>
+
+  <h3>Getting around</h3>
+  <p>One card is up at a time. <kbd>&#8984;1</kbd> is the Inbox, <kbd>&#8984;2</kbd> is Upcoming, <kbd>&#8984;3</kbd>&#8211;<kbd>&#8984;9</kbd> reach your areas, and <kbd>&#8984;&#8594;</kbd>&#8202;/&#8202;<kbd>&#8984;&#8592;</kbd> walk the deck. The menu-bar menu lists every card with its key.</p>
+
+  <h3>The rest of the keyboard</h3>
+  <table class="grammar">
+    <tr><td><kbd>&#8984;&#8217;</kbd></td><td>turn the card over to the note on the selected line</td></tr>
+    <tr><td><kbd>&#8984;&#8679;H</kbd></td><td>run the highlighter across it</td></tr>
+    <tr><td><kbd>&#8984;T</kbd></td><td>jump to today</td></tr>
+    <tr><td><kbd>&#8984;Z</kbd></td><td>undo &#8212; <kbd>&#8984;&#8679;Z</kbd> to redo</td></tr>
+  </table>
+
+  <h3>Notes and clippings</h3>
+  <p>Every line has a back. Turn the card over and write as long as you like; there is no save button, because there is no way to lose one. Images and video can be clipped to a line with the paperclip or by dragging them onto the note, and they fan out in the margin beside it.</p>
+
+  <h2>Common questions</h2>
+
+  <h3>What does it cost?</h3>
+  <p>Struck is free to download and free to use for two weeks. After that it&#8217;s <strong>$19.99, once</strong>, bought inside the app through the Mac App Store. There is no subscription and no second tier.</p>
+
+  <h3>What happens when the trial ends?</h3>
+  <p>You keep your notebook. Everything you&#8217;ve already written stays there to read, strike, unstrike, edit, file, annotate and delete &#8212; for as long as you keep the app. What stops is writing <em>new</em> lines and making new cards. Buy the unlock and the pen starts again where you left off.</p>
+
+  <h3>Where is my data?</h3>
+  <p>In one folder on your Mac, and nowhere else: a standard SQLite database holding your tasks and notes, with any images or video you&#8217;ve clipped stored alongside it. You can copy or back up that folder like any other. There is no sync and no server of ours anywhere &#8212; no account, no sign-in, nothing uploaded. Deleting the app and its data removes everything.</p>
+
+  <h3>Does it work offline?</h3>
+  <p>Always, and there is nothing to wait for &#8212; no spinner appears anywhere in the app, because nothing it does needs a network. The one exception is the optional GitHub link, and that stays off until you set it up.</p>
+
+  <h3>I struck something by accident</h3>
+  <p>Drag back across it, or press <kbd>&#8984;Z</kbd>. Strikes, edits, notes, moves, deletions and sweeps of completed tasks all come back. Two caveats worth knowing: a deleted line returns with its words but not with any clips that were on its note, and clips themselves sit outside undo &#8212; adding or removing one is not a step <kbd>&#8984;Z</kbd> can walk back. Merging or archiving a sub-list is also permanent, and clears the undo history behind it.</p>
+
+  <h3>How does the GitHub link work?</h3>
+  <p>Link a card to a repository from the card&#8217;s menu and its open issues become lines on it, each with the issue&#8217;s opening comment written into its note. Strike a line to close the issue; unstrike to reopen it. That open-or-closed state is the only thing Struck ever sends up &#8212; your dates, repeats, highlighting, your own notes, clips and ordering stay on your Mac.</p>
+  <p>You connect it with a personal access token you make yourself on github.com. Struck keeps it in your Mac&#8217;s Keychain and sends it to one place only, <code>api.github.com</code>. Disconnecting GitHub in Settings deletes the token.</p>
+
+  <h3>Can Claude use it?</h3>
+  <p>Yes. Struck ships an MCP connector, so an assistant you already use can read your cards and write on them in the same grammar you type. It stays off until you switch it on in Settings &#8250; Connections. It can capture lines, make cards and sub-lists, strike, unstrike and annotate &#8212; and it cannot delete a line, a card or a list, because there is no delete verb to give it. The one thing it can overwrite is a note: annotating replaces the whole of it, and since <kbd>&#8984;Z</kbd> does not reach an agent&#8217;s writes, the previous text does not come back. What it writes lands as ordinary marks on your page rather than as a tracked action, so <kbd>&#8984;Z</kbd> won&#8217;t reach them; you undo an agent&#8217;s mark the way you would your own, by striking, unstriking or rewriting the line.</p>
+
+  <h3>Why is there no overdue red?</h3>
+  <p>On purpose. A task that carries over simply presses a little harder into the page each day &#8212; age as ink density, not guilt. Nothing in Struck nags.</p>
+
+  <h2>Requirements</h2>
+  <ul class="req">
+    <li>macOS 14 or later</li>
+    <li>No account, no sign-in, no internet needed</li>
+    <li>Free for two weeks, then $19.99 once</li>
+  </ul>
+
+  <footer>
+    &copy; 2026 Circa75 Media, LLC &middot; <a href="../privacy/">Privacy</a>
+  </footer>
+
+</div>
+
+</body>
+</html>
