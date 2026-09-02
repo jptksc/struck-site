@@ -17,8 +17,18 @@
     --ink-40: rgba(56, 50, 42, 0.4);
     --ink-soft: rgba(56, 50, 42, 0.52);
     --rule: rgba(56, 50, 42, 0.11);
-    --marker: #a8e43c;
-    --on-marker: #2c3313;
+    --marker: #FCBADE;
+    --on-marker: #66462B;
+    /* THE CARD IS A SCREENSHOT, NOT A MOOD BOARD. These five are what the
+       app resolves for the stock a fresh install opens on — saturation at
+       its last stop, colour a fifth of the way round, tone at its first,
+       highlighter at its own last — read straight out of StockRecipe. */
+    --card-paper: #F9F0E9;
+    --card-ink: #66462B;
+    --card-rule: rgba(102, 70, 43, 0.11);
+    --card-headrule: rgba(102, 70, 43, 0.2475);
+    --card-margin-ink: rgba(102, 70, 43, 0.40);
+    --card-marker: #FCBADE;
     --desk1: #e9e1d2;
     --desk2: #d6cab4;
     --barglass: rgba(250, 246, 238, 0.62);
@@ -35,8 +45,8 @@
       --ink-40: rgba(214, 231, 221, 0.4);
       --ink-soft: rgba(214, 231, 221, 0.5);
       --rule: rgba(214, 231, 221, 0.09);
-      --marker: #2f5f9d;
-      --on-marker: #dce9f7;
+      --marker: #FCBADE;
+      --on-marker: #66462B;
       --desk1: #141a1e;
       --desk2: #07090c;
       --barglass: rgba(16, 20, 23, 0.55);
@@ -163,6 +173,17 @@
     background: rgba(127, 127, 127, 0.28);
     color: inherit;
   }
+  .hero-tok {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.82em;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    background: var(--marker);
+    color: var(--on-marker);
+    padding: 0.06em 0.22em;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
   .hint {
     margin-top: clamp(12px, 1.6vw, 16px);
     font-size: 13.5px;
@@ -185,68 +206,103 @@
   .reveal.d3 { animation-delay: 0.3s; }
   @keyframes rise { to { opacity: 1; transform: none; } }
 
-  /* ---------- the card ---------- */
-  .cardwrap { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  /* ---------- the card: 1:1 with the app ---------- */
+  /* EVERY NUMBER HERE IS THE APP'S OWN, not a likeness of it. 400pt card on a
+     16pt radius; rows on a 28pt pitch; body 14pt Light, sections 18pt Medium,
+     the header 22pt Medium tracked -0.3; text at 44pt from the card's edge
+     (20 padding + 24 margin) with a 64pt gutter left for the margin figure.
+     The strike is a 1.75pt nib at 92% ink — 0.125 of the body size — over
+     words that settle to 40%. Read out of PageRuling, PageTypography and
+     StrikeMark rather than measured off a screenshot. */
+  .cardwrap { display: flex; flex-direction: column; align-items: center; gap: 16px; }
   .card {
-    width: min(430px, 100%);
+    width: 400px;
+    max-width: 100%;
     border-radius: 16px;
-    background: var(--glass);
-    backdrop-filter: blur(26px) saturate(1.25);
-    -webkit-backdrop-filter: blur(26px) saturate(1.25);
+    background: var(--card-paper);
+    color: var(--card-ink);
     box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.45), 0 4px 14px -6px rgba(0, 0, 0, 0.25);
     overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
+    font-weight: 300;
+    letter-spacing: 0;
   }
-  .card-head { padding: 24px 22px 14px; position: relative; }
-  .card-head h2 { font-size: 26px; font-weight: 700; letter-spacing: -0.03em; }
-  .ruler { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--rule); }
+
+  /* The header: title, then the rule it lights. The beam is not a second
+     line over the rule — it is this rule lit, which is why they share a row. */
+  .card-head { height: 75px; position: relative; }
+  .card-head h2 {
+    position: absolute;
+    left: 44px;
+    top: 33px;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.3px;
+    line-height: 1;
+    color: var(--card-ink);
+  }
+  .ruler {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: 1px;
+    background: var(--card-headrule);
+  }
   .ruler .beam {
     position: absolute; left: 0; top: 0; bottom: 0;
     width: 0%;
-    background: linear-gradient(to right, transparent, var(--marker));
+    background: var(--card-marker);
     transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .ruler .beam::after {
-    content: "";
-    position: absolute; inset: -2px 0;
-    background: linear-gradient(to right, transparent, var(--marker));
-    filter: blur(4px);
-    opacity: 0.9;
   }
 
   .rows { position: relative; }
   .row {
-    height: var(--pitch);
-    display: flex;
-    align-items: center;
+    height: 28px;
     position: relative;
-    border-bottom: 1px solid var(--rule);
+    border-bottom: 1px solid var(--card-rule);
     touch-action: pan-y;
   }
   .row:last-child { border-bottom: none; }
-  .row .sigil {
+
+  /* A section's name sits on the page at the same margin its lines do. */
+  .row.sec {
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: -0.2px;
+    display: flex;
+    align-items: center;
+    padding-left: 44px;
+  }
+  .row.pad { pointer-events: none; }
+
+  .row.task { display: flex; align-items: center; padding-left: 44px; padding-right: 20px; }
+
+  /* The apparatus zone — everything left of the text. Its one mark is the
+     repeat sigil: two dots, 3pt across, 2.5pt apart, at margin ink. */
+  .row .rail {
     position: absolute;
     left: 0; top: 0; bottom: 0;
-    width: 30px;
+    width: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--ink-40);
-    letter-spacing: 0.05em;
+    gap: 2.5px;
+    padding-right: 6px;
   }
+  .row .rail i {
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: var(--card-margin-ink);
+  }
+
   .row .title {
-    margin-left: 30px;
     position: relative;
     z-index: 0;
     display: inline-flex;
-    align-items: baseline;
+    align-items: center;
     min-width: 0;
-    font-size: 17px;
-    font-weight: 400;
-    letter-spacing: -0.005em;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1;
   }
   .row .words {
     position: relative;
@@ -255,50 +311,70 @@
     text-overflow: ellipsis;
     transition: opacity 0.35s ease;
   }
-  .row.hl .words { color: var(--on-marker); padding: 0 5px; margin: 0 -5px; }
+  /* THE HIGHLIGHTER IS A BAND UNDER THE WORDS, and the words keep their own
+     ink on top of it — the app reverses nothing out. 1.5pt corners, the
+     radius HighlighterStroke uses. */
+  .row.hl .words { padding: 0 3px; margin: 0 -3px; }
   .row.hl .words::before {
     content: "";
     position: absolute;
-    inset: 1px -4px 2px -4px;
-    background: var(--marker);
+    inset: -2px -3px -2px -3px;
+    background: var(--card-marker);
     z-index: -1;
-    border-radius: 2px;
+    border-radius: 1.5px;
     filter: url(#rough);
-    transform: rotate(-0.3deg);
+    transition: opacity 0.35s ease;
   }
+
+  /* The note's mark: three rules, the last one short, because a paragraph
+     seen from across the room ends that way. 6 / 6 / 3.5pt on 1pt, 1.5pt
+     apart, riding 3.5pt above the line's middle, 6pt clear of the last word. */
   .row .note {
     flex: none;
-    width: 10px; height: 9px;
-    margin-left: 8px;
+    margin-left: 6px;
     align-self: center;
-    opacity: 0.5;
+    transform: translateY(-3.5px);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5px;
+    transition: opacity 0.35s ease;
   }
-  .row .note line { stroke: var(--ink); stroke-width: 1.1; stroke-linecap: round; }
+  .row .note i {
+    display: block;
+    height: 1px;
+    width: 6px;
+    border-radius: 0.5px;
+    background: var(--card-margin-ink);
+  }
+  .row .note i:last-child { width: 3.5px; }
+
+  /* The margin figure: 10pt — round(14 × 0.69) — medium, tabular, 40% ink. */
   .row .fig {
     margin-left: auto;
     padding-left: 12px;
-    padding-right: 18px;
     flex: none;
-    font-size: 13px;
+    font-size: 10px;
     font-weight: 500;
-    color: var(--ink-40);
+    color: var(--card-margin-ink);
     font-variant-numeric: tabular-nums;
     transition: opacity 0.35s ease;
   }
-  .row.struck .words, .row.struck .fig, .row.struck .sigil, .row.struck .note { opacity: 0.4; }
-  .row.hl .words::before { transition: opacity 0.35s ease; }
 
-  /* blank row: ghost dots + the pen */
-  .row.blank { cursor: text; }
-  .row.blank .ghost {
-    position: absolute;
-    left: 30px; bottom: 13px;
-    display: flex; gap: 5px;
-  }
+  /* A struck line settles to 40% ink. The MARK does not — it is drawn on the
+     canvas at 92% and stays there, which is the whole look of a crossed-out
+     line: faded words with a dark stroke through them. */
+  .row.struck .words,
+  .row.struck .fig,
+  .row.struck .note,
+  .row.struck .rail { opacity: 0.4; }
+
+  /* the blank row: the pen, and the dots that offer it */
+  .row.blank { cursor: text; padding-left: 44px; padding-right: 20px; display: flex; align-items: center; }
+  .row.blank .ghost { display: flex; gap: 4px; align-items: center; }
   .row.blank .ghost i {
-    width: 3.5px; height: 3.5px;
+    width: 3px; height: 3px;
     border-radius: 50%;
-    background: var(--ink);
+    background: var(--card-ink);
     opacity: 0;
   }
   .row.blank:hover .ghost i, .row.blank.writing .ghost i { animation: dotwave 1.15s ease-out forwards; }
@@ -307,9 +383,9 @@
   .row.blank.writing .ghost { display: none; }
   @keyframes dotwave {
     0% { opacity: 0; transform: translateY(0); }
-    16% { opacity: 1; transform: translateY(-4px); }
+    16% { opacity: 1; transform: translateY(-3px); }
     32% { transform: translateY(0); }
-    48% { transform: translateY(-2.5px); }
+    48% { transform: translateY(-2px); }
     64% { transform: translateY(0); }
     100% { opacity: 1; transform: translateY(0); }
   }
@@ -317,14 +393,13 @@
     position: absolute;
     inset: 0;
     width: 100%;
-    padding: 0 18px 0 30px;
+    padding: 0 20px 0 44px;
     background: transparent;
     border: none;
     outline: none;
-    font: 400 17px/1 -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
-    letter-spacing: -0.005em;
-    color: var(--ink);
-    caret-color: var(--ink);
+    font: 300 14px/1 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+    color: var(--card-ink);
+    caret-color: var(--card-ink);
   }
   #ink {
     position: absolute;
@@ -332,63 +407,73 @@
     pointer-events: none;
     z-index: 5;
   }
-
-  .cardhint {
+  .demo-hint {
     font-size: 13px;
+    line-height: 1.6;
     color: var(--ink-soft);
-    font-weight: 500;
     text-align: center;
-    max-width: 40ch;
-    line-height: 1.65;
+    max-width: 34ch;
   }
-  .cardhint code {
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  .demo-hint code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
     font-size: 12px;
-    background: rgba(127, 127, 127, 0.14);
-    padding: 1.5px 6px;
-    border-radius: 5px;
+    background: rgba(127, 127, 127, 0.13);
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
   }
 
   /* ---------- features ---------- */
+  /* Two even columns with the bodies written to a 15-character spread, so the
+     cards bottom out together instead of leaving ragged air in one column. */
   .features {
     margin-top: clamp(90px, 15vh, 160px);
     display: grid;
     grid-template-columns: 1fr;
-    gap: clamp(30px, 4vw, 44px) clamp(40px, 6vw, 80px);
+    gap: clamp(28px, 3.4vw, 38px) clamp(40px, 6vw, 72px);
   }
   @media (min-width: 760px) { .features { grid-template-columns: 1fr 1fr; } }
+  .feature { display: grid; grid-template-columns: 30px 1fr; column-gap: 14px; row-gap: 4px; }
+  .feature svg {
+    grid-row: 1 / span 2;
+    width: 20px; height: 20px;
+    margin-top: 2px;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    color: var(--ink);
+    opacity: 0.75;
+  }
   .feature h3 {
-    font-size: clamp(18px, 2vw, 21px);
-    font-weight: 700;
+    font-size: clamp(16px, 1.6vw, 18px);
+    font-weight: 650;
     letter-spacing: -0.02em;
-    margin-bottom: 7px;
   }
   .feature p {
-    font-size: 15.5px;
-    line-height: 1.65;
+    font-size: 15px;
+    line-height: 1.6;
     color: var(--ink-soft);
     font-weight: 450;
-    max-width: 52ch;
   }
-  .feature p strong { color: var(--ink); font-weight: 600; }
-  .specimen {
-    margin-top: 12px;
-    font-size: 16px;
-    letter-spacing: -0.005em;
-    color: var(--ink);
-    background: var(--glass);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    border-radius: 10px;
-    padding: 13px 16px;
-    box-shadow: 0 8px 22px -14px rgba(0, 0, 0, 0.4);
-    white-space: nowrap;
-    overflow-x: auto;
+  .feature p code, .hero-tok {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.88em;
   }
-  .specimen .tok { font-style: normal; color: var(--ink-40); }
+  .feature p code { color: var(--ink); background: rgba(127,127,127,0.12); padding: 1px 5px; border-radius: 4px; }
 
   /* ---------- CTA + footer ---------- */
   .cta { margin-top: clamp(90px, 15vh, 160px); }
+  .cta-sub {
+    margin-top: 14px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    max-width: 46ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
   .cta h2 {
     font-size: clamp(28px, 4vw, 44px);
     font-weight: 800;
@@ -451,14 +536,14 @@
 
   <section class="hero">
     <div>
-      <h1 class="reveal">The to&#8209;do app where you cross things out.</h1>
-      <p class="sub reveal d1">No checkboxes. You drag across a task and a line of ink follows your hand — the same gesture you&#8217;d use on paper. Struck lives in your Mac&#8217;s menu&nbsp;bar, one keystroke from whatever you&#8217;re working on.</p>
+      <h1 class="reveal">Type <span class="hero-tok">call mom &gt;friday</span>.<br>It never turns red.</h1>
+      <p class="sub reveal d1">A to-do app in your Mac&#8217;s menu bar: one typed line carries the day, the hour, the repeat and the filing &#8212; then it waits, with no badge and no count.</p>
       <a class="dl-btn reveal d2" href="#card" id="dlTop">
         <svg viewBox="0 0 16 19" fill="currentColor" aria-hidden="true"><path d="M13.1 10.1c0-2 1.7-3 1.8-3.1-1-1.4-2.5-1.6-3-1.6-1.3-.1-2.5.8-3.2.8-.7 0-1.7-.8-2.8-.8C4.5 5.4 3.1 6.2 2.3 7.5.7 10.2 1.9 14.2 3.4 16.4c.8 1.1 1.7 2.3 2.8 2.3 1.1 0 1.6-.7 2.9-.7 1.3 0 1.7.7 2.9.7 1.2 0 2-1.1 2.7-2.2.9-1.2 1.2-2.4 1.2-2.5 0 0-2.8-1-2.8-3.9zM10.9 3.3c.6-.7 1-1.7.9-2.7-.9 0-1.9.6-2.5 1.3-.6.6-1 1.6-.9 2.6 1 .1 1.9-.5 2.5-1.2z"/></svg>
         Download for Mac
         <span class="soon">soon</span>
       </a>
-      <p class="hint reveal d3">Coming to the Mac App Store for macOS&nbsp;14+. Free for two weeks, then <strong>$19.99 once</strong> — never a subscription.<br>Want to know the day it ships? <a href="mailto:hi@jason.sc?subject=Struck">hi@jason.sc</a></p>
+      <p class="hint reveal d3">macOS&nbsp;14+ &middot; Free for 14 days, then <strong>$19.99 once</strong> on the Mac App Store. No subscription, no account.<br>Want to know the day it ships? <a href="mailto:hi@jason.sc?subject=Struck">hi@jason.sc</a></p>
     </div>
 
     <div class="cardwrap reveal d2" id="card">
@@ -468,77 +553,76 @@
           <div class="ruler"><i class="beam" id="beam"></i></div>
         </header>
         <div class="rows" id="rows">
-          <div class="row" aria-hidden="true"></div>
-          <div class="row task" data-task><span class="title"><span class="words">Ship the beta</span></span><span class="fig">friday</span></div>
-          <div class="row task hl" data-task><span class="title"><span class="words">Cross out something important</span></span></div>
-          <div class="row task struck" data-task data-prestruck><span class="title"><span class="words">Install a to-do app that nags you</span></span></div>
-          <div class="row task" data-task><span class="title"><span class="words">Book the studio for the mixes</span><svg class="note" viewBox="0 0 10 9" aria-hidden="true"><line x1="0.5" y1="1.5" x2="9.5" y2="1.5"/><line x1="0.5" y1="4.5" x2="9.5" y2="4.5"/><line x1="0.5" y1="7.5" x2="6.5" y2="7.5"/></svg></span><span class="fig">sep 2</span></div>
-          <div class="row task" data-task><span class="sigil">..</span><span class="title"><span class="words">Water the ficus</span></span></div>
+          <div class="row pad"></div>
+          <div class="row sec">Today</div>
+          <div class="row task" data-task><span class="rail"></span><span class="title"><span class="words">Call the vet</span></span><span class="fig">8:30am</span></div>
+          <div class="row task hl" data-task><span class="rail"></span><span class="title"><span class="words">Send the mastering notes</span></span><span class="fig">friday</span></div>
+          <div class="row task" data-task data-prestruck><span class="rail"></span><span class="title"><span class="words">Install a to-do app that nags you</span></span></div>
+          <div class="row task" data-task><span class="rail"></span><span class="title"><span class="words">Book the studio for the mixes</span><span class="note" aria-hidden="true"><i></i><i></i><i></i></span></span><span class="fig">sep 2</span></div>
+          <div class="row pad"></div>
+          <div class="row sec">Tomorrow</div>
+          <div class="row task" data-task><span class="rail"><i></i><i></i></span><span class="title"><span class="words">Water the ficus</span></span></div>
           <div class="row blank" id="blankRow">
             <span class="ghost" aria-hidden="true"><i></i><i></i><i></i></span>
             <input id="pen" type="text" autocomplete="off" spellcheck="false" enterkeyhint="done" aria-label="Write a task" style="opacity:0">
           </div>
-          <div class="row bare" aria-hidden="true"></div>
+          <div class="row pad"></div>
           <canvas id="ink"></canvas>
         </div>
       </div>
-      <p class="cardhint">It&#8217;s real ink — drag across a line to strike it, drag backward to take it off. The last row takes writing: try <code>Call mom &gt;friday !!</code></p>
+      <p class="demo-hint">Drag across a line to strike it, drag back to take it off. The blank row takes writing — try <code>call mom &gt;friday !!</code></p>
     </div>
   </section>
 
   <section class="features" aria-label="What Struck is">
     <div class="feature">
-      <h3>Done is a gesture, not a checkbox</h3>
-      <p>Drag across a line and the ink lays down as far as you&#8217;ve crossed &#8212; a nib-width mark with a hand&#8217;s wobble in it, and past a point it finishes the stroke for you. <strong>The line then rests at 40% ink with the mark through it</strong>, exactly where you drew it, sitting among the live lines rather than dropping into an archive you&#8217;ll never open. Drag back to take it off.</p>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 8h.01"/><path d="M12 12h.01"/><path d="M14 8h.01"/><path d="M16 12h.01"/><path d="M18 8h.01"/><path d="M6 8h.01"/><path d="M7 16h10"/><path d="M8 12h.01"/><rect width="20" height="16" x="2" y="4" rx="2"/></svg>
+      <h3>Type dates, skip the picker</h3>
+      <p>Write <code>call the vet &gt;friday &gt;8:30am</code>. Press return: the day, the hour and a reminder, no picker anywhere.</p>
     </div>
     <div class="feature">
-      <h3>Two keys are the whole interface</h3>
-      <p>No Dock icon, no window to manage, nothing to launch. <strong>&#8997;Space</strong> gives you one line to write on from inside any app &#8212; type, hit return, it&#8217;s gone. <strong>&#8997;&#8679;Space</strong> opens the full page, exactly where you left it.</p>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>
+      <h3>Repeats that keep their day</h3>
+      <p>Type <code>..1w</code> and the next one lands a week on from the due day, not from whenever you got around to it.</p>
     </div>
     <div class="feature">
-      <h3>Type the details, don&#8217;t click them</h3>
-      <p>A date, an hour, a repeat, a priority and a filing all fit inside the sentence you were already writing. Tokens dim as Struck recognises them; press return and they disappear, leaving small marks in the margin. Anything it can&#8217;t read stays in your title at full ink &#8212; nothing is silently dropped.</p>
-      <div class="specimen">Master the interlude <i class="tok">&gt;friday</i> <i class="tok">&gt;2pm</i> <i class="tok">!!</i> <i class="tok">..1w</i> <i class="tok">@Studio</i></div>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg>
+      <h3>Filed as you type it</h3>
+      <p><code>@Errands</code> sends the line to an area, <code>#Gear</code> to a sub-list on it. No dragging, no second window to open.</p>
     </div>
     <div class="feature">
-      <h3>Nothing ever turns red</h3>
-      <p>No badges, no counts, no progress rings, and <strong>no overdue state, anywhere</strong>. A task you keep carrying simply presses a little harder into the page each day. Age shows up as ink, not as an alarm.</p>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h-1a2 2 0 0 1-2-2 2 2 0 0 1-2 2H6"/><path d="M13 8h7a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-7"/><path d="M5 16H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h1"/><path d="M6 4h1a2 2 0 0 1 2 2 2 2 0 0 1 2-2h1"/><path d="M9 6v12"/></svg>
+      <h3>It never eats your words</h3>
+      <p>Anything Struck cannot read stays in the title at full ink. Reopen a line and the marks come back as tokens.</p>
     </div>
     <div class="feature">
-      <h3>One card at a time</h3>
-      <p>An Inbox for whatever&#8217;s unfiled, Upcoming for everything with a date, and a card for each area of your life. Only one is on screen, ever. <strong>&#8984;1&#8211;9</strong> deals a card straight to the top; <strong>&#8984;&#8592;</strong> and <strong>&#8984;&#8594;</strong> walk the deck.</p>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M17 17H4a1 1 0 0 1-.74-1.673C4.59 13.956 6 12.499 6 8a6 6 0 0 1 .258-1.742"/><path d="m2 2 20 20"/><path d="M8.668 3.01A6 6 0 0 1 18 8c0 2.687.77 4.653 1.707 6.05"/></svg>
+      <h3>Nothing keeps score</h3>
+      <p>No badges, no counts, no progress rings, no red, no overdue. A carried line just darkens a shade instead.</p>
     </div>
     <div class="feature">
-      <h3>Every line has a back</h3>
-      <p>Press <strong>&#8984;&#8217;</strong> and the card turns over onto the same ruled paper. Write as long as you like; clip images and video against a line and they fan out in the margin like prints on a desk. There is no save button, because there is no way to lose one.</p>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"/></svg>
+      <h3>Capture without switching apps</h3>
+      <p><strong>&#8997;Space</strong> opens one line over any app. Return sends it and the panel stays open; Esc puts you back to work.</p>
     </div>
     <div class="feature">
-      <h3>Paper you mix yourself</h3>
-      <p>A card is a pane of tinted glass over your desktop, and its ink is derived from its paper so it stays legible over any wallpaper you own. Four levers &#8212; saturation, colour, tone, highlighter &#8212; mix the stock, and any card can wear its own.</p>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+      <h3>Close issues by striking</h3>
+      <p>Off until you add a token: then a card carries a repo&#8217;s open issues, and striking one closes it there.</p>
     </div>
     <div class="feature">
-      <h3>It never leaves your Mac</h3>
-      <p>Everything you write lives in one folder on your Mac &#8212; a plain SQLite file with whatever you&#8217;ve clipped sitting beside it, yours to copy or back up like any other. <strong>No account, no sign-in, no server of ours, nothing uploaded.</strong> It works offline because it has never been anywhere else. The only thing Struck itself ever sends anywhere is the open-or-closed state of an issue on a card you deliberately linked to GitHub &#8212; and if you switch on agent access below, whatever your assistant reads goes wherever that assistant runs.</p>
-    </div>
-    <div class="feature">
-      <h3>$19.99, once</h3>
-      <p>Free for two weeks, then a single purchase in the Mac App Store. No subscription, no tiers, no account to cancel. And when a trial ends Struck doesn&#8217;t lock you out of your own notebook &#8212; everything already written stays there to read, strike, edit and rearrange. <strong>What runs dry is writing new lines and making new cards.</strong></p>
-    </div>
-    <div class="feature">
-      <h3>A card can watch a repo</h3>
-      <p>Point a card at a GitHub repository and its open issues arrive as lines on it. Strike one and the issue closes; close one on GitHub and it&#8217;s already struck here next time you look. Optional, off until you set it up, and it runs on a token you make yourself.</p>
-    </div>
-    <div class="feature">
-      <h3>Let an agent write on it</h3>
-      <p>Struck speaks MCP, so Claude &#8212; or anything else that speaks it &#8212; can read and write your cards in exactly the grammar you type. Off until you turn it on. It can capture, file, strike, unstrike and annotate, and <strong>it cannot delete a line, a card or a list</strong> &#8212; there is no delete verb to give it. An agent&#8217;s marks are ordinary marks: you strike, unstrike or rewrite them exactly as you would your own.</p>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+      <h3>Your assistant can write here</h3>
+      <p>Off until you switch on MCP: an assistant can capture, file, strike and annotate. It cannot delete a line or card.</p>
     </div>
   </section>
 
   <section class="cta">
-    <h2>Made for the small pleasure of crossing it out.</h2>
+    <h2>No account, no server &#8212; your list is one file on your Mac.</h2>
+    <p class="cta-sub">Stop after the trial and every line you wrote stays readable and strikable.</p>
     <a class="dl-btn" href="mailto:hi@jason.sc?subject=Struck">
       <svg viewBox="0 0 16 19" fill="currentColor" aria-hidden="true"><path d="M13.1 10.1c0-2 1.7-3 1.8-3.1-1-1.4-2.5-1.6-3-1.6-1.3-.1-2.5.8-3.2.8-.7 0-1.7-.8-2.8-.8C4.5 5.4 3.1 6.2 2.3 7.5.7 10.2 1.9 14.2 3.4 16.4c.8 1.1 1.7 2.3 2.8 2.3 1.1 0 1.6-.7 2.9-.7 1.3 0 1.7.7 2.9.7 1.2 0 2-1.1 2.7-2.2.9-1.2 1.2-2.4 1.2-2.5 0 0-2.8-1-2.8-3.9zM10.9 3.3c.6-.7 1-1.7.9-2.7-.9 0-1.9.6-2.5 1.3-.6.6-1 1.6-.9 2.6 1 .1 1.9-.5 2.5-1.2z"/></svg>
-      Email me when it ships
+      Download for Mac
     </a>
   </section>
 
@@ -547,7 +631,7 @@
 <footer>
   <div class="wrap">
     <strong>One sheet on a desk, not another window.</strong><br>
-    Quiet by default &middot; macOS 14+ &middot; $19.99 once
+    macOS 14+ &middot; Free for 14 days &middot; $19.99 once
     <p class="legal">&copy; 2026 Circa75 Media, LLC &middot; <a href="support/">Support</a> &middot; <a href="privacy/">Privacy</a></p>
   </div>
 </footer>
@@ -556,6 +640,14 @@
 (function () {
   "use strict";
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* THE APP'S OWN NUMBERS. StrikeMark strokes one constant nib —
+     PageTypography.bodySize (14) x nibFraction (0.125) — at inkOpacity 0.92,
+     and PageView commits past 0.6 of the line. Nothing here varies with how
+     fast the hand moves, because nothing there does. */
+  var NIB = 1.75;
+  var MARK_INK = 0.92;
+  var COMMIT = 0.6;
 
   /* ---------- clock ---------- */
   var clock = document.getElementById("clock");
@@ -579,7 +671,7 @@
   var dpr = 1;
 
   function inkColor() {
-    return getComputedStyle(document.body).getPropertyValue("--ink").trim() || "#38322a";
+    return getComputedStyle(document.body).getPropertyValue("--card-ink").trim() || "#66462B";
   }
 
   function sizeCanvas() {
@@ -661,12 +753,12 @@
       if (s.hidden) return;
       var pts = pixelPts(row, s);
       if (s.trim != null) pts = pts.slice(0, Math.max(2, Math.round(pts.length * s.trim)));
-      drawRibbon(pts, 0.55, color);
+      drawRibbon(pts, MARK_INK, color);
     });
 
-    if (active && active.pts.length > 1) drawRibbon(active.pts, 0.9, color);
+    if (active && active.pts.length > 1) drawRibbon(active.pts, MARK_INK, color);
     for (var ti = 0; ti < transients.length; ti++) {
-      if (transients[ti].pts.length > 1) drawRibbon(transients[ti].pts, 0.9, color);
+      if (transients[ti].pts.length > 1) drawRibbon(transients[ti].pts, MARK_INK, color);
     }
 
     /* particles */
@@ -919,7 +1011,7 @@
     if (!active) return;
     if (rows.hasPointerCapture && rows.hasPointerCapture(e.pointerId)) rows.releasePointerCapture(e.pointerId);
     var covered = (active.maxX - active.minX) / active.g.ww;
-    if (covered >= 0.55) completeStrike(active.row);
+    if (covered >= COMMIT) completeStrike(active.row);
     else retractStrike();
   }
   rows.addEventListener("pointerup", endGesture);
@@ -939,8 +1031,10 @@
   function focusPen() { pen.focus(); }
   blankRow.addEventListener("click", focusPen);
   rows.addEventListener("click", function (e) {
-    var bare = e.target.closest ? e.target.closest(".row.bare") : null;
-    if (bare) focusPen();
+    /* The padding rows are page, not line — clicking one is a click on the
+       sheet, and the sheet hands the pen to the row that takes writing. */
+    var pad = e.target.closest ? e.target.closest(".row.pad") : null;
+    if (pad) focusPen();
   });
   pen.addEventListener("focus", function () { blankRow.classList.add("writing"); pen.style.opacity = 1; });
   pen.addEventListener("blur", function () {
@@ -990,7 +1084,10 @@
     row.className = "row task" + (important ? " hl" : "");
     row.setAttribute("data-task", "");
     var h = "";
-    if (repeat) h += '<span class="sigil">..</span>';
+    /* The rail is always there — it is the apparatus zone, not the sigil.
+       A repeat puts two dots in it; everything else leaves it empty, and the
+       text still starts at the same 44pt margin either way. */
+    h += repeat ? '<span class="rail"><i></i><i></i></span>' : '<span class="rail"></span>';
     h += '<span class="title"><span class="words"></span></span>';
     if (fig) h += '<span class="fig"></span>';
     row.innerHTML = h;
