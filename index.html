@@ -236,7 +236,7 @@
   .card-head h2 {
     position: absolute;
     left: 44px;
-    top: 33px;
+    top: 34px;
     font-size: 22px;
     font-weight: 500;
     letter-spacing: -0.3px;
@@ -265,11 +265,14 @@
   .rows {
     position: relative;
     height: 496px;
+    padding-top: 2.71px;
+    cursor: text;
     background: repeating-linear-gradient(
       to bottom,
-      transparent 0 24.25px,
-      var(--card-rule) 24.25px 24.75px,
-      transparent 24.75px 28px);
+      transparent 0 25.04px,
+      var(--card-rule) 25.04px 25.54px,
+      transparent 25.54px 28px);
+    background-position: 0 2.71px;
   }
   .row {
     height: 28px;
@@ -279,6 +282,7 @@
 
   /* A section's name sits on the page at the same margin its lines do. */
   .row.sec {
+    transform: translateY(-1.51px);
     font-size: 18px;
     font-weight: 500;
     display: flex;
@@ -363,6 +367,7 @@
 
   /* The margin figure: 10pt — round(14 × 0.69) — medium, tabular, 40% ink. */
   .row .fig {
+    transform: translateY(1.51px);
     margin-left: auto;
     padding-left: 12px;
     flex: none;
@@ -707,7 +712,7 @@
     var w = words.getBoundingClientRect();
     return {
       top: r.top - rr.top,
-      cy: r.top - rr.top + r.height / 2 + 1,
+      cy: r.top - rr.top + 15.61,   /* rowBaseline 19.29 less half the x-height */
       wl: w.left - rr.left,
       ww: Math.max(20, w.width)
     };
@@ -1007,12 +1012,8 @@
     var x = e.clientX - rr.left;
     var yRaw = e.clientY - rr.top;
     if (Math.abs(x - active.lastX) < 2 && active.pts.length) return;
-    var dt = Math.max(1, e.timeStamp - active.lastT);
-    var v = Math.hypot(x - active.lastX, yRaw - active.lastY) / dt;   /* px/ms */
-    var targetW = Math.max(1.4, Math.min(5, 3.4 * (1.35 - Math.min(v, 2.4) * 0.42)));
-    active.w += (targetW - active.w) * 0.3;                            /* smoothed nib */
     var y = g.cy + Math.max(-8, Math.min(8, (yRaw - g.cy) * 0.35)) + wob(active.seed, x) * 1.1;
-    active.pts.push({ x: x, y: y, w: active.w, seed: active.seed });
+    active.pts.push({ x: x, y: y, w: NIB, seed: active.seed });
     active.minX = Math.min(active.minX, x);
     active.maxX = Math.max(active.maxX, x);
     active.lastX = x; active.lastY = yRaw; active.lastT = e.timeStamp;
