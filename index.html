@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Struck — the to-do app you type, that never nags</title>
-<meta name="description" content="A to-do app in your Mac's menu bar. One typed line carries the day, the hour, the repeat and the filing — then it waits, with no badge, no count and no red. $19.99 once.">
+<title>Struck — a to-do list in your Mac’s menu bar</title>
+<meta name="description" content="Struck is a to-do list in your Mac's menu bar. Write the thought down over whatever you're doing and you're back before you've lost your place. Free for 14 days, then $19.99 once.">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<meta property="og:title" content="Struck — the to-do app you type, that never nags">
-<meta property="og:description" content="Type call mom &gt;friday and press return: the line files itself under Friday. No pickers, no badges, no counts, no red. Lives in your menu bar, stays on your Mac.">
+<meta property="og:title" content="Struck — a to-do list in your Mac’s menu bar">
+<meta property="og:description" content="Write the thought down over whatever you're doing, and you're back before you've lost your place. Put the dentist on Thursday in plain words; it waits, quiet, until you cross it out.">
 <meta property="og:type" content="website">
 <style>
   :root {
@@ -124,9 +124,8 @@
   }
   @media (min-width: 980px) { .hero { grid-template-columns: 1.05fr 0.95fr; } }
   h1 {
-    isolation: isolate;
-    font-size: clamp(40px, 6.4vw, 76px);
-    line-height: 1.03;
+    font-size: clamp(28px, 3.6vw, 44px);
+    line-height: 1.18;
     font-weight: 800;
     letter-spacing: -0.045em;
     max-width: 13ch;
@@ -167,30 +166,6 @@
     border-radius: 999px;
     background: rgba(127, 127, 127, 0.28);
     color: inherit;
-  }
-  /* The typed example in the headline. It carries the app's own highlighter
-     because that is what the mark means here — but a monospace face at display
-     size is already loud, so the band sits behind the words rather than
-     boxing them, and the token gives up a fifth of its size to the sentence
-     it belongs to. */
-  .hero-tok {
-    font-family: ui-monospace, "SF Mono", Menlo, monospace;
-    font-size: 0.66em;
-    font-weight: 500;
-    color: var(--on-marker);
-    letter-spacing: -0.03em;
-    white-space: nowrap;
-    position: relative;
-    padding: 0 0.12em;
-  }
-  .hero-tok::before {
-    content: "";
-    position: absolute;
-    left: 0; right: 0;
-    top: 0.12em; bottom: 0.08em;
-    background: var(--marker);
-    border-radius: 1.5px;
-    z-index: -1;
   }
   .hint {
     margin-top: clamp(12px, 1.6vw, 16px);
@@ -550,14 +525,14 @@
 
   <section class="hero">
     <div>
-      <h1 class="reveal">Type <span class="hero-tok">call mom &gt;friday</span>.<br>It never turns red.</h1>
-      <p class="sub reveal d1">A to-do app in your Mac&#8217;s menu bar: one typed line carries the day, the hour, the repeat and the filing &#8212; then it waits, with no badge and no count.</p>
+      <h1 class="reveal">Struck is a to-do list in your Mac&#8217;s menu bar. Write the thought down over whatever you&#8217;re doing, and you&#8217;re back before you&#8217;ve lost your place.</h1>
+      <p class="sub reveal d1">Mid-email, mid-call, mid-anything: put the dentist on Thursday and the invoice at nine in plain words, with no form to fill in. Each waits on its day, quiet, until you draw a line through it.</p>
       <a class="dl-btn reveal d2" href="#card" id="dlTop">
         <svg viewBox="0 0 16 19" fill="currentColor" aria-hidden="true"><path d="M13.1 10.1c0-2 1.7-3 1.8-3.1-1-1.4-2.5-1.6-3-1.6-1.3-.1-2.5.8-3.2.8-.7 0-1.7-.8-2.8-.8C4.5 5.4 3.1 6.2 2.3 7.5.7 10.2 1.9 14.2 3.4 16.4c.8 1.1 1.7 2.3 2.8 2.3 1.1 0 1.6-.7 2.9-.7 1.3 0 1.7.7 2.9.7 1.2 0 2-1.1 2.7-2.2.9-1.2 1.2-2.4 1.2-2.5 0 0-2.8-1-2.8-3.9zM10.9 3.3c.6-.7 1-1.7.9-2.7-.9 0-1.9.6-2.5 1.3-.6.6-1 1.6-.9 2.6 1 .1 1.9-.5 2.5-1.2z"/></svg>
         Download for Mac
         <span class="soon">soon</span>
       </a>
-      <p class="hint reveal d3">macOS&nbsp;14+ &middot; Free for 14 days, then <strong>$19.99 once</strong> on the Mac App Store. No subscription, no account.<br>Want to know the day it ships? <a href="mailto:hi@jason.sc?subject=Struck">hi@jason.sc</a></p>
+      <p class="hint reveal d3">macOS&nbsp;14 or later. Free for 14 days, then <strong>$19.99 once</strong> on the Mac App Store. No subscription, no account.<br>Want to know the day it ships? <a href="mailto:hi@jason.sc?subject=Struck">hi@jason.sc</a></p>
     </div>
 
     <div class="cardwrap reveal d2" id="card">
@@ -585,56 +560,56 @@
           <canvas id="ink"></canvas>
         </div>
       </div>
-      <p class="demo-hint">Drag across a line to strike it, drag back to take it off. The blank row takes writing — try <code>call mom &gt;friday !!</code></p>
+      <p class="demo-hint">Drag across a line to strike it, drag back to take it off. The blank row takes writing — try <code>call mom &gt;friday !!</code> and press Return.</p>
     </div>
   </section>
 
   <section class="features" aria-label="What Struck is">
     <div class="feature">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3h7"/><path d="M3 3h5.28a1 1 0 0 1 .948.684l5.544 16.632a1 1 0 0 0 .949.684H21"/></svg>
+      <h3>Write it from anywhere</h3>
+      <p>Press <strong>&#8997;Space</strong> over any app and a line opens. Type, press Return, and it&#8217;s on the sheet. Esc, and you&#8217;re back where you were.</p>
+    </div>
+    <div class="feature">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 8h.01"/><path d="M12 12h.01"/><path d="M14 8h.01"/><path d="M16 12h.01"/><path d="M18 8h.01"/><path d="M6 8h.01"/><path d="M7 16h10"/><path d="M8 12h.01"/><rect width="20" height="16" x="2" y="4" rx="2"/></svg>
-      <h3>Type dates, skip the picker</h3>
-      <p>Write <code>call the vet &gt;friday &gt;8:30am</code>. Press return: the day, the hour, and a reminder if you allow one.</p>
+      <h3>Say when in the sentence</h3>
+      <p><code>Call the dentist &gt;friday &gt;8:30am !!</code>. The day, hour and priority ride in the line, then step into the margin. No pickers, no form.</p>
+    </div>
+    <div class="feature">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-2.5a1 1 0 0 1-.8-.4l-.9-1.2A1 1 0 0 0 15 3h-2a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z"/><path d="M20 21a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-2.9a1 1 0 0 1-.88-.55l-.42-.85a1 1 0 0 0-.92-.6H13a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z"/><path d="M3 5a2 2 0 0 0 2 2h3"/><path d="M3 3v13a2 2 0 0 0 2 2h3"/></svg>
+      <h3>A card for each area</h3>
+      <p>Home, Work, the boat: a card each, sub-lists inside. Type <code>@Work</code> on any line to file it there; on that card, <code>#Gear</code> picks the list.</p>
+    </div>
+    <div class="feature">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m16 6-8.414 8.586a2 2 0 0 0 2.829 2.829l8.414-8.586a4 4 0 1 0-5.657-5.657l-8.379 8.551a6 6 0 1 0 8.485 8.485l8.379-8.551"/></svg>
+      <h3>Notes, images and video</h3>
+      <p>Flip a line over for notes on the same ruled paper, no save button. Clip images and video; they fan out in the margin like prints.</p>
     </div>
     <div class="feature">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>
-      <h3>Repeats that keep their day</h3>
-      <p>Type <code>..1w</code> and the next one lands a week on from the due day, not from whenever you got around to it.</p>
-    </div>
-    <div class="feature">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg>
-      <h3>Filed as you type it</h3>
-      <p><code>@Errands</code> files a line into an area from anywhere; on that area&#8217;s own card, <code>#Gear</code> puts it in a sub-list.</p>
-    </div>
-    <div class="feature">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h-1a2 2 0 0 1-2-2 2 2 0 0 1-2 2H6"/><path d="M13 8h7a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-7"/><path d="M5 16H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h1"/><path d="M6 4h1a2 2 0 0 1 2 2 2 2 0 0 1 2-2h1"/><path d="M9 6v12"/></svg>
-      <h3>Unread marks stay put</h3>
-      <p>Anything Struck cannot parse stays in the title at full ink. Reopen a line and its date, hour and repeat return.</p>
+      <h3>Repeats keep their day</h3>
+      <p>Add <code>..1w</code> and the next comes due a week from this one&#8217;s due day, not from when you got to it. Late once won&#8217;t shift the week.</p>
     </div>
     <div class="feature">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M17 17H4a1 1 0 0 1-.74-1.673C4.59 13.956 6 12.499 6 8a6 6 0 0 1 .258-1.742"/><path d="m2 2 20 20"/><path d="M8.668 3.01A6 6 0 0 1 18 8c0 2.687.77 4.653 1.707 6.05"/></svg>
-      <h3>It never raises its voice</h3>
-      <p>No badges, no counts, no progress rings, no red, no overdue. A carried line just darkens a shade instead.</p>
-    </div>
-    <div class="feature">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h6l6 18h6"/><path d="M14 3h7"/></svg>
-      <h3>Capture without switching apps</h3>
-      <p><strong>&#8997;Space</strong> opens one line over any app. Return sends it and the panel stays open; Esc puts you back to work.</p>
+      <h3>Nothing nags you</h3>
+      <p>No badge, no count, no red, no overdue pile. A line you carry darkens a shade with each day. You&#8217;ll see it when you look.</p>
     </div>
     <div class="feature">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-      <h3>Close issues by striking</h3>
-      <p>Add a token, link a card to a repo, and it carries that repo&#8217;s open issues. Strike one and it closes there.</p>
+      <h3>GitHub issues become lines</h3>
+      <p>Link a card to a repo and its open issues arrive as lines, first comment in the note. Strike one and it closes. Off until set up.</p>
     </div>
     <div class="feature">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
       <h3>Your assistant can write here</h3>
-      <p>Off until you switch on MCP: an assistant can write lines, strike and annotate. It cannot delete a line or card.</p>
+      <p>Off until switched on. Then an MCP assistant can add lines in the same grammar, read cards and strike. It can&#8217;t delete a line.</p>
     </div>
   </section>
 
   <section class="cta">
-    <h2>No account, no server &#8212; your list is one file on your Mac.</h2>
-    <p class="cta-sub">Stop after the trial and every line you wrote stays readable and strikable.</p>
+    <h2>Your iPhone is next.</h2>
+    <p class="cta-sub">An iPhone app is on its way. When it arrives, the list on your Mac will be the list in your pocket, with nothing to set up and nothing to watch: no sync screen, no spinner, no conflict to settle. You&#8217;ll write on one and cross out on the other. Paper doesn&#8217;t spin.</p>
     <a class="dl-btn" href="mailto:hi@jason.sc?subject=Struck">
       <svg viewBox="0 0 16 19" fill="currentColor" aria-hidden="true"><path d="M13.1 10.1c0-2 1.7-3 1.8-3.1-1-1.4-2.5-1.6-3-1.6-1.3-.1-2.5.8-3.2.8-.7 0-1.7-.8-2.8-.8C4.5 5.4 3.1 6.2 2.3 7.5.7 10.2 1.9 14.2 3.4 16.4c.8 1.1 1.7 2.3 2.8 2.3 1.1 0 1.6-.7 2.9-.7 1.3 0 1.7.7 2.9.7 1.2 0 2-1.1 2.7-2.2.9-1.2 1.2-2.4 1.2-2.5 0 0-2.8-1-2.8-3.9zM10.9 3.3c.6-.7 1-1.7.9-2.7-.9 0-1.9.6-2.5 1.3-.6.6-1 1.6-.9 2.6 1 .1 1.9-.5 2.5-1.2z"/></svg>
       Download for Mac
