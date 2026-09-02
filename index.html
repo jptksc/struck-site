@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Struck — the to-do app where you cross things out</title>
-<meta name="description" content="A menu-bar to-do app for macOS. No checkboxes — you drag across a task and cross it out yourself. Everything stays on your Mac. $19.99 once, never a subscription.">
+<title>Struck — the to-do app you type, that never nags</title>
+<meta name="description" content="A to-do app in your Mac's menu bar. One typed line carries the day, the hour, the repeat and the filing — then it waits, with no badge, no count and no red. $19.99 once.">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<meta property="og:title" content="Struck — the to-do app where you cross things out">
-<meta property="og:description" content="No checkboxes. You drag across a task and a line of ink follows your hand — the same gesture you'd use on paper. It lives in your Mac's menu bar and never leaves it.">
+<meta property="og:title" content="Struck — the to-do app you type, that never nags">
+<meta property="og:description" content="Type call mom &gt;friday and press return: the line files itself under Friday. No pickers, no badges, no counts, no red. Lives in your menu bar, stays on your Mac.">
 <meta property="og:type" content="website">
 <style>
   :root {
@@ -289,8 +289,6 @@
 
   .row.task { display: flex; align-items: center; padding-left: 44px; padding-right: 20px; }
 
-  /* The apparatus zone — everything left of the text. Its one mark is the
-     repeat sigil: two dots, 3pt across, 2.5pt apart, at margin ink. */
   /* The apparatus zone: the 24pt margin between the page's padding and its
      text. Its one mark is the repeat sigil, and the app writes it as the
      literal two dots in the body face — not as drawn discs. */
@@ -567,7 +565,7 @@
           <div class="row pad"></div>
           <div class="row sec">Today</div>
           <div class="row task" data-task><span class="rail"></span><span class="title"><span class="words">Call the vet</span></span><span class="fig">8:30am</span></div>
-          <div class="row task hl" data-task><span class="rail"></span><span class="title"><span class="words">Send the mastering notes</span></span><span class="fig">friday</span></div>
+          <div class="row task hl" data-task><span class="rail"></span><span class="title"><span class="words">Send the mastering notes</span></span><span class="fig">9:15am</span></div>
           <div class="row task struck" data-task data-prestruck><span class="rail"></span><span class="title"><span class="words">Install a to-do app that nags you</span></span></div>
           <div class="row task" data-task><span class="rail"></span><span class="title"><span class="words">Book the studio for the mixes</span><span class="note" aria-hidden="true"><i></i><i></i><i></i></span></span><span class="fig">sep 2</span></div>
           <div class="row pad"></div>
@@ -800,13 +798,14 @@
     lastFrame = now;
 
     /* stroke animations */
+    var hadAnimations = animations.length;
     var keep = [];
     for (var j = 0; j < animations.length; j++) {
       if (animations[j](now)) keep.push(animations[j]);
     }
     animations = keep;
 
-    if (active || particles.length || animations.length) frame();
+    if (active || particles.length || animations.length || hadAnimations) frame();
   }
   function frame() {
     if (!rafId) rafId = requestAnimationFrame(redraw);
@@ -1050,7 +1049,7 @@
     /* The padding rows are page, not line — clicking one is a click on the
        sheet, and the sheet hands the pen to the row that takes writing. */
     var pad = e.target.closest ? e.target.closest(".row.pad") : null;
-    if (pad) focusPen();
+    if (pad || e.target === rows) focusPen();
   });
   pen.addEventListener("focus", function () { blankRow.classList.add("writing"); pen.style.opacity = 1; });
   pen.addEventListener("blur", function () {
@@ -1070,7 +1069,10 @@
     wednesday: "wednesday", wed: "wednesday", thursday: "thursday", thu: "thursday", thur: "thursday", thurs: "thursday",
     friday: "friday", fri: "friday", saturday: "saturday", sat: "saturday", sunday: "sunday", sun: "sunday"
   };
-  var SHORT = { today: "tod", tomorrow: "tom", monday: "mon", tuesday: "tue", wednesday: "wed", thursday: "thu", friday: "fri", saturday: "sat", sunday: "sun" };
+  /* How the app writes a day in the margin: today, tomorrow and yesterday as
+     the words, and every other day as its month-and-number. A weekday name
+     never appears there — TaskViews.dueLabel has no branch that produces one. */
+  var SHORT = { today: "today", tomorrow: "tomorrow", yesterday: "yesterday" };
   var MONTHS = { jan: 1, feb: 1, mar: 1, apr: 1, may: 1, jun: 1, jul: 1, aug: 1, sep: 1, oct: 1, nov: 1, dec: 1 };
 
   function commitLine(raw) {
@@ -1091,14 +1093,22 @@
     title = title.replace(/\s+/g, " ").trim();
     if (!title) return;
 
+    /* WHAT THE MARGIN IS ALLOWED TO SAY. The app writes today, tomorrow and
+       yesterday as words and every other date as its month-and-number — never
+       a weekday name, because a line due on a named day files UNDER a heading
+       with that name, and a block that already states the day silences the
+       margin (PageLineView.marginDate). So a bare weekday prints nothing here
+       either; only its hour, if it was given one, survives to the margin. */
+    var named = SHORT[day] || (day && day.indexOf(" ") > 0 ? day : null);
     var fig = null;
-    if (day) fig = hour ? (SHORT[day] || day) + ", " + hour : day;
+    if (named) fig = hour ? named + ", " + hour : named;
     else if (hour) fig = hour;
     else if (area) fig = area;
 
     var row = document.createElement("div");
     row.className = "row task" + (important ? " hl" : "");
     row.setAttribute("data-task", "");
+    row.setAttribute("data-typed", "");
     var h = "";
     /* The rail is always there — it is the apparatus zone, not the sigil.
        A repeat puts two dots in it; everything else leaves it empty, and the
@@ -1110,6 +1120,15 @@
     row.querySelector(".words").textContent = title;
     if (fig) row.querySelector(".fig").textContent = fig;
     rows.insertBefore(row, blankRow);
+    /* Keep the writing row on the sheet: the card is a fixed 580, so once the
+       pen would cross the bottom rule, the oldest line the visitor wrote gives
+       up its place. Nothing typed is lost silently to a clipped caret. */
+    while (blankRow.offsetTop + 28 > rows.clientHeight) {
+      var oldest = rows.querySelector(".row.task[data-typed]");
+      if (!oldest) break;
+      strokes.delete(oldest);
+      oldest.remove();
+    }
     sizeCanvas();
     updateBeam();
     frame();

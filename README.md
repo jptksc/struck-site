@@ -1,7 +1,7 @@
 # struck-site
 
 The landing page, support and privacy pages for **Struck** — a menu-bar to-do app
-for macOS where you cross things out.
+for macOS that you type, and that never nags.
 
 | Path | Page |
 | --- | --- |
