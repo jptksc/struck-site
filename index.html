@@ -199,6 +199,28 @@
        inside the frame is 400 of it — the app's width, kept exactly. */
     width: min(454px, 100%);
     height: auto;
+    /* THE EDGE IS FEATHERED, NOT MATCHED. A browser colour-manages video down
+       a different path from CSS, so on a wide-gamut display the film's brown
+       lands a few levels off the same brown written as a hex — which is why a
+       screen sample reads #E6DDCA where the decoded pixels say #E3D8C3, and
+       why no single value holds across displays. The outer sliver fades to
+       nothing instead: the edge stops existing rather than being matched.
+       The fade spans the WHOLE desk margin — full at the card's own edge,
+       nothing at the frame's — so the brown does not sit there as a patch
+       with soft sides; it is simply not there by the time the page begins.
+       The card begins 5.94% in at the sides, 2.69% down from the top and
+       2.13% up from the foot, and no fade reaches past those. */
+    --feather-x: 5.9%;
+    --feather-t: 2.65%;
+    --feather-b: 2.1%;
+    -webkit-mask-image:
+      linear-gradient(to right, transparent, #000 var(--feather-x), #000 calc(100% - var(--feather-x)), transparent),
+      linear-gradient(to bottom, transparent, #000 var(--feather-t), #000 calc(100% - var(--feather-b)), transparent);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, transparent, #000 var(--feather-x), #000 calc(100% - var(--feather-x)), transparent),
+      linear-gradient(to bottom, transparent, #000 var(--feather-t), #000 calc(100% - var(--feather-b)), transparent);
+    mask-composite: intersect;
   }
 
   /* ---------- features ---------- */
