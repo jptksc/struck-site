@@ -24,8 +24,17 @@
     --card-headrule: rgba(102, 70, 43, 0.2475);
     --card-margin-ink: rgba(102, 70, 43, 0.40);
     --card-marker: #FCBADE;
-    --desk1: #e9e1d2;
-    --desk2: #d6cab4;
+    /* THE DESK IS THE FILM'S OWN DESK, and it is not one colour. The loop was
+       shot on this brown, which carries the wallpaper's fall — about seven
+       levels from head to foot. These two are the film's own ground as the
+       BROWSER decodes it, sampled off the video into a canvas; a screen
+       sample reads a few levels lighter because the display profile lifts it,
+       and matching that number leaves the page lighter than the film. The
+       page runs the same fall in the same direction, so there is no edge to
+       see. The sheen belongs to the dark desk alone. */
+    --desk1: #e3d8c3;
+    --desk2: #dcd1bc;
+    --sheen: transparent;
     --barglass: rgba(250, 246, 238, 0.62);
     --btn-ink: #2b2620;
     --btn-paper: #f7efe1;
@@ -38,6 +47,7 @@
       --ink-soft: rgba(214, 231, 221, 0.5);
       --desk1: #141a1e;
       --desk2: #07090c;
+      --sheen: rgba(255, 255, 255, 0.16);
       --barglass: rgba(16, 20, 23, 0.55);
       --btn-ink: #d6e7dd;
       --btn-paper: #10161a;
@@ -48,8 +58,8 @@
   body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
     background:
-      radial-gradient(120vw 80vh at 78% -10%, rgba(255, 255, 255, 0.16), transparent 60%),
-      linear-gradient(165deg, var(--desk1), var(--desk2));
+      radial-gradient(120vw 80vh at 78% -10%, var(--sheen), transparent 60%),
+      linear-gradient(180deg, var(--desk1), var(--desk2));
     background-attachment: fixed;
     color: var(--ink);
     -webkit-font-smoothing: antialiased;
@@ -177,235 +187,18 @@
   .reveal.d3 { animation-delay: 0.3s; }
   @keyframes rise { to { opacity: 1; transform: none; } }
 
-  /* ---------- the card: 1:1 with the app ---------- */
-  /* EVERY NUMBER HERE IS THE APP'S OWN, not a likeness of it. 400pt card on a
-     16pt radius; rows on a 28pt pitch; body 14pt Light, sections 18pt Medium,
-     the header 22pt Medium tracked -0.3; text at 44pt from the card's edge
-     (20 padding + 24 margin) with a 64pt gutter left for the margin figure.
-     The strike is a 1.75pt nib at 92% ink — 0.125 of the body size — over
-     words that settle to 40%. Read out of PageRuling, PageTypography and
-     StrikeMark rather than measured off a screenshot. */
-  .cardwrap { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-  .card {
-    width: min(400px, 100%);
-    height: 580px;
-    border-radius: 16px;
-    background: var(--card-paper);
-    color: var(--card-ink);
-    box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.45), 0 4px 14px -6px rgba(0, 0, 0, 0.25);
-    overflow: hidden;
-    user-select: none;
-    -webkit-user-select: none;
-    font-weight: 300;
-    letter-spacing: 0;
-  }
-
-  /* The header: title, then the rule it lights. The beam is not a second
-     line over the rule — it is this rule lit, which is why they share a row. */
-  .card-head { height: 84px; position: relative; }
-  .card-head h2 {
-    position: absolute;
-    left: 44px;
-    top: 34px;
-    font-size: 22px;
-    font-weight: 500;
-    letter-spacing: -0.3px;
-    line-height: 1;
-    color: var(--card-ink);
-  }
-  .ruler {
-    position: absolute; left: 0; right: 0; bottom: 0;
-    height: 0.5px;
-    background: var(--card-headrule);
-  }
-  .ruler .beam {
-    position: absolute; left: 0; top: 0; bottom: 0;
-    width: 0%;
-    background: linear-gradient(to right, rgba(252, 186, 222, 0) 0%, var(--card-marker) 86%, #FAABD7 100%);
-    box-shadow: 0 0 5px 0 rgba(252, 186, 222, 0.45);
-    transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  /* THE RULING BELONGS TO THE PAPER, NOT TO THE LINES ON IT. The app rules
-     the whole sheet to its bottom edge whether anything is written there or
-     not — RuledPaper exists for exactly that — so the rule cannot be a border
-     on a row element or the ruling stops where the writing does. Each 28pt
-     band carries its rule 24.5pt down, which is baselineDrop (6) under the
-     row's baseline, drawn at a device hairline rather than a full pixel. */
-  .rows {
-    position: relative;
-    height: 496px;
-    padding-top: 2.71px;
-    cursor: text;
-    background: repeating-linear-gradient(
-      to bottom,
-      transparent 0 25.04px,
-      var(--card-rule) 25.04px 25.54px,
-      transparent 25.54px 28px);
-    background-position: 0 2.71px;
-  }
-  .row {
-    height: 28px;
-    position: relative;
-    touch-action: pan-y;
-  }
-
-  /* A section's name sits on the page at the same margin its lines do. */
-  .row.sec {
-    transform: translateY(-1.51px);
-    font-size: 18px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    padding-left: 44px;
-  }
-  .row.pad { cursor: text; }
-
-  .row.task { display: flex; align-items: center; padding-left: 44px; padding-right: 20px; }
-
-  /* The apparatus zone: the 24pt margin between the page's padding and its
-     text. Its one mark is the repeat sigil, and the app writes it as the
-     literal two dots in the body face — not as drawn discs. */
-  .row .rail {
-    position: absolute;
-    left: 20px; top: 0; bottom: 0;
-    width: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 300;
-    line-height: 1;
-    color: var(--card-margin-ink);
-  }
-
-  .row .title {
-    max-width: 272px;
-    flex: 0 1 272px;
-    position: relative;
-    z-index: 0;
-    display: inline-flex;
-    align-items: center;
-    min-width: 0;
-    font-size: 14px;
-    font-weight: 300;
-    line-height: 1;
-  }
-  .row .words {
-    position: relative;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: opacity 0.35s ease;
-  }
-  /* THE HIGHLIGHTER IS A BAND UNDER THE WORDS, and the words keep their own
-     ink on top of it — the app reverses nothing out. 1.5pt corners, the
-     radius HighlighterStroke uses. */
-  .row.hl .words { padding: 0 3px; margin: 0 -3px; }
-  .row.hl .words::before {
-    content: "";
-    position: absolute;
-    inset: -2px -3px -2px -3px;
-    background: var(--card-marker);
-    z-index: -1;
-    border-radius: 1.5px;
-    filter: url(#rough) drop-shadow(0 0 5px rgba(252, 186, 222, 0.45));
-    transition: opacity 0.35s ease;
-  }
-
-  /* The note's mark: three rules, the last one short, because a paragraph
-     seen from across the room ends that way. 6 / 6 / 3.5pt on 1pt, 1.5pt
-     apart, riding 3.5pt above the line's middle, 6pt clear of the last word. */
-  .row .note {
-    flex: none;
-    margin-left: 6px;
-    align-self: center;
-    transform: translateY(-3.5px);
-    display: flex;
-    flex-direction: column;
-    gap: 1.5px;
-    transition: opacity 0.35s ease;
-  }
-  .row .note i {
+  /* ---------- the film ---------- */
+  /* The card used to be rebuilt here in HTML, to the app's own numbers. It is
+     the app now — filmed on this same brown, so it needs nothing around it. */
+  .cardwrap { display: flex; flex-direction: column; align-items: center; }
+  .film {
     display: block;
-    height: 1px;
-    width: 6px;
-    border-radius: 0.5px;
-    background: var(--card-margin-ink);
-  }
-  .row .note i:last-child { width: 3.5px; }
-
-  /* The margin figure: 10pt — round(14 × 0.69) — medium, tabular, 40% ink. */
-  .row .fig {
-    transform: translateY(1.51px);
-    margin-left: auto;
-    padding-left: 12px;
-    flex: none;
-    font-size: 10px;
-    font-weight: 500;
-    color: var(--card-margin-ink);
-    font-variant-numeric: tabular-nums;
-    transition: opacity 0.35s ease;
-  }
-
-  /* A struck line settles to 40% ink. The MARK does not — it is drawn on the
-     canvas at 92% and stays there, which is the whole look of a crossed-out
-     line: faded words with a dark stroke through them. */
-  .row.struck .words { opacity: 0.4; }
-
-  /* the blank row: the pen, and the dots that offer it */
-  .row.blank { cursor: text; padding-left: 44px; padding-right: 20px; display: flex; align-items: center; }
-  .row.blank .ghost { display: flex; gap: 2.5px; align-items: center; }
-  .row.blank .ghost i {
-    width: 3px; height: 3px;
-    border-radius: 50%;
-    background: rgba(102, 70, 43, 0.32);
-    opacity: 0;
-  }
-  .row.blank:hover .ghost i, .row.blank.writing .ghost i { animation: dotwave 1.15s ease-out forwards; }
-  .row.blank .ghost i:nth-child(2) { animation-delay: 0.08s; }
-  .row.blank .ghost i:nth-child(3) { animation-delay: 0.16s; }
-  .row.blank.writing .ghost { display: none; }
-  @keyframes dotwave {
-    0% { opacity: 0; transform: translateY(0); }
-    16% { opacity: 1; transform: translateY(-3px); }
-    32% { transform: translateY(0); }
-    48% { transform: translateY(-2px); }
-    64% { transform: translateY(0); }
-    100% { opacity: 1; transform: translateY(0); }
-  }
-  #pen {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    padding: 0 20px 0 44px;
-    background: transparent;
-    border: none;
-    outline: none;
-    font: 300 14px/1 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
-    color: var(--card-ink);
-    caret-color: var(--card-ink);
-  }
-  #ink {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 5;
-  }
-  .demo-hint {
-    font-size: 13px;
-    line-height: 1.6;
-    color: var(--ink-soft);
-    text-align: center;
-    max-width: 34ch;
-  }
-  .demo-hint code {
-    font-family: ui-monospace, "SF Mono", Menlo, monospace;
-    font-size: 12px;
-    background: rgba(127, 127, 127, 0.13);
-    padding: 2px 6px;
-    border-radius: 4px;
-    white-space: nowrap;
+    /* NO FRAME, NO CROP, NO SHADOW. The film was shot on the desk this page
+       is made of, so the paper around the card IS the page's own ground and
+       the card's own shadow is the only one it needs. 454px because the card
+       inside the frame is 400 of it — the app's width, kept exactly. */
+    width: min(454px, 100%);
+    height: auto;
   }
 
   /* ---------- features ---------- */
@@ -482,8 +275,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .reveal { animation: none; opacity: 1; transform: none; }
-    .row.blank:hover .ghost i, .row.blank.writing .ghost i { animation: none; opacity: 1; }
-    #barGlyph.tick .tickstroke, .ruler .beam { animation: none; transition: none; }
+    #barGlyph.tick .tickstroke { animation: none; transition: none; }
     html { scroll-behavior: auto; }
   }
 </style>
@@ -534,31 +326,15 @@
     </div>
 
     <div class="cardwrap reveal d2" id="card">
-      <div class="card" id="theCard">
-        <header class="card-head">
-          <h2>Upcoming</h2>
-          <div class="ruler"><i class="beam" id="beam"></i></div>
-        </header>
-        <div class="rows" id="rows">
-          <div class="row pad"></div>
-          <div class="row sec">Today</div>
-          <div class="row task" data-task><span class="rail"></span><span class="title"><span class="words">Call the vet</span></span><span class="fig">8:30am</span></div>
-          <div class="row task hl" data-task><span class="rail"></span><span class="title"><span class="words">Send the mastering notes</span></span><span class="fig">9:15am</span></div>
-          <div class="row task struck" data-task data-prestruck><span class="rail"></span><span class="title"><span class="words">Install a to-do app that nags you</span></span></div>
-          <div class="row task" data-task><span class="rail"></span><span class="title"><span class="words">Book the studio for the mixes</span><span class="note" aria-hidden="true"><i></i><i></i><i></i></span></span><span class="fig">sep 2</span></div>
-          <div class="row pad"></div>
-          <div class="row sec">Tomorrow</div>
-          <div class="row task" data-task><span class="rail">..</span><span class="title"><span class="words">Water the ficus</span></span></div>
-          <div class="row blank" id="blankRow">
-            <span class="ghost" aria-hidden="true"><i></i><i></i><i></i></span>
-            <input id="pen" type="text" autocomplete="off" spellcheck="false" enterkeyhint="done" aria-label="Write a task" style="opacity:0">
-          </div>
-          <div class="row pad"></div>
-          <div class="row pad"></div>
-          <canvas id="ink"></canvas>
-        </div>
-      </div>
-      <p class="demo-hint">Drag across a line to strike it, drag back to take it off. The blank row takes writing — try <code>call mom &gt;friday !!</code> and press Return.</p>
+      <!-- The app itself, recorded off the menu bar in one unbroken pass: no
+           mock, no re-creation, every mark made by a hand on the real thing.
+           Muted and inert by intent — it is a photograph that moves, not a
+           player, so it carries no chrome and asks for nothing. -->
+      <video class="film" autoplay loop muted playsinline preload="metadata"
+             poster="struck-loop-poster.jpg"
+             aria-label="Struck in use: a task struck off, a note opened, a list written, and the day it all came from.">
+        <source src="struck-loop-web.mp4" type="video/mp4">
+      </video>
     </div>
   </section>
 
@@ -639,14 +415,6 @@
   "use strict";
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* THE APP'S OWN NUMBERS. StrikeMark strokes one constant nib —
-     PageTypography.bodySize (14) x nibFraction (0.125) — at inkOpacity 0.92,
-     and PageView commits past 0.6 of the line. Nothing here varies with how
-     fast the hand moves, because nothing there does. */
-  var NIB = 1.75;
-  var MARK_INK = 0.92;
-  var COMMIT = 0.6;
-
   /* ---------- clock ---------- */
   var clock = document.getElementById("clock");
   function tickClock() {
@@ -658,484 +426,50 @@
   tickClock();
   setInterval(tickClock, 15000);
 
-  /* ---------- card + canvas ---------- */
-  var rows = document.getElementById("rows");
-  var canvas = document.getElementById("ink");
-  var ctx = canvas.getContext("2d");
-  var beam = document.getElementById("beam");
+  /* ---------- the film ---------- */
+  /* A LOOP THAT RUNS ITSELF IS MOTION NOBODY ASKED FOR. Where the system says
+     reduce it, the film holds on its poster and grows the one control that
+     lets a viewer start it deliberately — the only chrome it ever wears. */
+  var film = document.querySelector(".film");
+  if (film && reduced) {
+    film.removeAttribute("autoplay");
+    film.controls = true;
+    film.pause();
+  }
+
+  /* ---------- the desk, aligned to the film ---------- */
+  /* The film's ground falls seven levels from head to foot, and the page's
+     falls over the whole viewport, so the two agree at one height and part
+     everywhere else — four levels at the film's top edge, which on a flat
+     brown is a visible rectangle. The page's own fall is pinned to the
+     film's instead: same colours, same two heights, flat above and below.
+     The CSS gradient underneath is the no-JS answer and is close enough. */
+  var deskTop = "#e3d8c3", deskFoot = "#dcd1bc";
+  function alignDesk() {
+    if (!film) return;
+    var r = film.getBoundingClientRect(), vh = window.innerHeight;
+    if (!r.height || !vh) return;
+    var a = Math.max(0, Math.min(100, (r.top / vh) * 100));
+    var b = Math.max(a, Math.min(100, (r.bottom / vh) * 100));
+    document.body.style.backgroundImage =
+      "linear-gradient(180deg, " + deskTop + " 0, " + deskTop + " " + a.toFixed(2) + "%, " +
+      deskFoot + " " + b.toFixed(2) + "%, " + deskFoot + " 100%)";
+  }
+  if (film) {
+    var deskQueued = false;
+    function queueDesk() {
+      if (deskQueued) return;
+      deskQueued = true;
+      requestAnimationFrame(function () { deskQueued = false; alignDesk(); });
+    }
+    alignDesk();
+    window.addEventListener("resize", queueDesk);
+    window.addEventListener("scroll", queueDesk, { passive: true });
+    if (film.readyState < 1) film.addEventListener("loadedmetadata", alignDesk, { once: true });
+  }
+
+  /* ---------- the menu-bar glyph goes to the film ---------- */
   var barGlyph = document.getElementById("barGlyph");
-  var blankRow = document.getElementById("blankRow");
-  var pen = document.getElementById("pen");
-  var dpr = 1;
-
-  function inkColor() {
-    return getComputedStyle(document.body).getPropertyValue("--card-ink").trim() || "#66462B";
-  }
-
-  function sizeCanvas() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = rows.clientWidth * dpr;
-    canvas.height = rows.clientHeight * dpr;
-    canvas.style.width = rows.clientWidth + "px";
-    canvas.style.height = rows.clientHeight + "px";
-  }
-
-  /* smooth two-octave wobble, deterministic per seed */
-  function wob(seed, x) {
-    return Math.sin(x * 0.085 + seed * 7.31) * 0.55 +
-           Math.sin(x * 0.023 + seed * 3.17) * 0.85 +
-           Math.sin(x * 0.19 + seed * 11.7) * 0.22;
-  }
-
-  /* geometry of a task row, relative to .rows */
-  function geo(row) {
-    var rr = rows.getBoundingClientRect();
-    var r = row.getBoundingClientRect();
-    var words = row.querySelector(".words");
-    var w = words.getBoundingClientRect();
-    return {
-      top: r.top - rr.top,
-      cy: r.top - rr.top + 15.61,   /* rowBaseline 19.29 less half the x-height */
-      wl: w.left - rr.left,
-      ww: Math.max(20, w.width)
-    };
-  }
-
-  /* persisted strokes: row -> {seed, pts:[{u, dy, w}]} */
-  var strokes = new Map();
-  var taskRows = function () {
-    return Array.prototype.slice.call(rows.querySelectorAll(".row.task"));
-  };
-
-  function drawRibbon(pts, alpha, color) {
-    if (pts.length < 2) return;
-    ctx.beginPath();
-    var i, p;
-    for (i = 0; i < pts.length; i++) {
-      p = pts[i];
-      var y = p.y - p.w / 2 + wob(p.seed + 1, p.x) * 0.2;
-      if (i === 0) ctx.moveTo(p.x * dpr, y * dpr);
-      else ctx.lineTo(p.x * dpr, y * dpr);
-    }
-    for (i = pts.length - 1; i >= 0; i--) {
-      p = pts[i];
-      ctx.lineTo(p.x * dpr, (p.y + p.w / 2 + wob(p.seed + 2, p.x) * 0.2) * dpr);
-    }
-    ctx.closePath();
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.globalAlpha = 1;
-  }
-
-  function pixelPts(row, s) {
-    var g = geo(row);
-    return s.pts.map(function (p) {
-      return { x: g.wl + p.u * g.ww, y: g.cy + p.dy + wob(s.seed, g.wl + p.u * g.ww) * 1.1, w: p.w, seed: s.seed };
-    });
-  }
-
-  var active = null;        /* the stroke being drawn */
-  var transients = [];      /* strokes mid-animation (completing or retracting) */
-  var animations = [];      /* running stroke animations */
-  var particles = [];       /* burst discs */
-  var rafId = null;
-  var lastFrame = 0;
-
-  function redraw(now) {
-    rafId = null;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    var color = inkColor();
-
-    strokes.forEach(function (s, row) {
-      if (s.hidden) return;
-      var pts = pixelPts(row, s);
-      if (s.trim != null) pts = pts.slice(0, Math.max(2, Math.round(pts.length * s.trim)));
-      drawRibbon(pts, MARK_INK, color);
-    });
-
-    if (active && active.pts.length > 1) drawRibbon(active.pts, MARK_INK, color);
-    for (var ti = 0; ti < transients.length; ti++) {
-      if (transients[ti].pts.length > 1) drawRibbon(transients[ti].pts, MARK_INK, color);
-    }
-
-    /* particles */
-    if (particles.length) {
-      var dt = lastFrame ? Math.min(now - lastFrame, 40) : 16;
-      var alive = [];
-      for (var i = 0; i < particles.length; i++) {
-        var p = particles[i];
-        if (!p.born) p.born = now;
-        p.life = now - p.born;      /* wall clock, so throttled tabs don't replay old bursts */
-        if (p.life >= p.ttl) continue;
-        var damp = Math.exp(-p.k * dt);
-        p.vx *= damp; p.vy *= damp;
-        p.vy += p.g * dt;
-        p.x += p.vx * dt; p.y += p.vy * dt;
-        var a = p.life > p.ttl * 0.6 ? 1 - (p.life - p.ttl * 0.6) / (p.ttl * 0.4) : 1;
-        ctx.globalAlpha = a * 0.9;
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.arc(p.x * dpr, p.y * dpr, p.r * dpr, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = 1;
-        alive.push(p);
-      }
-      particles = alive;
-    }
-    lastFrame = now;
-
-    /* stroke animations */
-    var hadAnimations = animations.length;
-    var keep = [];
-    for (var j = 0; j < animations.length; j++) {
-      if (animations[j](now)) keep.push(animations[j]);
-    }
-    animations = keep;
-
-    if (active || particles.length || animations.length || hadAnimations) frame();
-  }
-  function frame() {
-    if (!rafId) rafId = requestAnimationFrame(redraw);
-  }
-
-  /* ---------- ruler + menu glyph ---------- */
-  function updateBeam() {
-    var all = taskRows();
-    var struck = all.filter(function (r) { return r.classList.contains("struck"); }).length;
-    beam.style.width = all.length ? (struck / all.length * 100) + "%" : "0%";
-  }
-
-  function microTick() {
-    if (reduced) return;
-    barGlyph.classList.remove("tick");
-    void barGlyph.offsetWidth;
-    barGlyph.classList.add("tick");
-  }
-
-  /* ---------- burst: the page's own ink coming apart in the air ---------- */
-  function burst(x, y) {
-    if (reduced) return;
-    var n = 22;
-    for (var i = 0; i < n; i++) {
-      var a = Math.random() * Math.PI * 2;
-      var sp = (0.22 + Math.random() * 0.18);            /* px per ms: 220-400 pt/s */
-      particles.push({
-        x: x + (Math.random() - 0.5) * 3,
-        y: y + (Math.random() - 0.5) * 3,
-        vx: Math.cos(a) * sp,
-        vy: Math.sin(a) * sp * 0.88,
-        g: 0.00115,
-        k: 0.0042,
-        r: 1.3 + Math.random() * 1.6,
-        life: 0,
-        ttl: 700 + Math.random() * 250
-      });
-    }
-    frame();
-  }
-
-  /* ---------- completing / retracting / unstriking ---------- */
-  function persistStroke(row, stroke) {
-    var g = geo(row);
-    var s = { seed: stroke.seed, pts: [] };
-    for (var i = 0; i < stroke.pts.length; i++) {
-      var p = stroke.pts[i];
-      s.pts.push({ u: (p.x - g.wl) / g.ww, dy: p.y - g.cy - wob(stroke.seed, p.x) * 1.1, w: p.w });
-    }
-    strokes.set(row, s);
-  }
-  function dropTransient(s) {
-    var i = transients.indexOf(s);
-    if (i >= 0) transients.splice(i, 1);
-  }
-
-  function completeStrike(row) {
-    var g = geo(row);
-    var last = active.pts[active.pts.length - 1];
-    var startX = last.x, startY = last.y, startW = last.w;
-    var target = g.wl + g.ww + 5;
-    var myStroke = active;
-    active = null; /* handed to the animation */
-    transients.push(myStroke);
-    var t0 = performance.now();
-    var D1 = reduced ? 0 : 130, D2 = reduced ? 0 : 90;
-
-    function ease(t) { return 1 - Math.pow(1 - t, 3); }
-
-    animations.push(function (now) {
-      var t = now - t0;
-      var x;
-      if (t < D1) {
-        x = startX + (target + 4 - startX) * ease(t / D1);
-      } else if (t < D1 + D2) {
-        x = target + 4 - 4 * ((t - D1) / D2);
-      } else {
-        x = target;
-      }
-      /* rebuild the extension tail */
-      while (myStroke.pts.length && myStroke.pts[myStroke.pts.length - 1].ext) myStroke.pts.pop();
-      var steps = Math.max(2, Math.round((x - startX) / 5));
-      for (var i = 1; i <= steps; i++) {
-        var f = i / steps;
-        var px = startX + (x - startX) * f;
-        myStroke.pts.push({
-          x: px,
-          y: startY + (g.cy - startY) * f + wob(myStroke.seed, px) * 1.1,
-          w: NIB,
-          seed: myStroke.seed,
-          ext: true
-        });
-      }
-      if (t >= D1 + D2) {
-        dropTransient(myStroke);
-        persistStroke(row, myStroke);
-        row.classList.add("struck");
-        updateBeam();
-        microTick();
-        burst(target, g.cy);
-        frame();
-        return false;
-      }
-      return true;
-    });
-    frame();
-  }
-
-  function retractStrike() {
-    var myStroke = active;
-    active = null;
-    transients.push(myStroke);
-    var t0 = performance.now();
-    var n = myStroke.pts.length;
-    var D = reduced ? 0 : 200;
-    animations.push(function (now) {
-      var f = D ? Math.min(1, (now - t0) / D) : 1;
-      myStroke.pts.length = Math.max(0, Math.round(n * (1 - f)));
-      if (f >= 1) { dropTransient(myStroke); return false; }
-      return true;
-    });
-    frame();
-  }
-
-  function unstrike(row) {
-    var s = strokes.get(row);
-    if (!s) { row.classList.remove("struck"); updateBeam(); return; }
-    var t0 = performance.now();
-    var D = reduced ? 0 : 240;
-    animations.push(function (now) {
-      var f = D ? Math.min(1, (now - t0) / D) : 1;
-      s.trim = 1 - f;
-      if (f >= 1) {
-        strokes.delete(row);
-        row.classList.remove("struck");
-        updateBeam();
-        return false;
-      }
-      return true;
-    });
-    frame();
-  }
-
-  /* ---------- gesture: the axis is the verb ---------- */
-  var pending = null;
-  rows.addEventListener("pointerdown", function (e) {
-    if (e.button !== 0 && e.pointerType === "mouse") return;
-    var row = e.target.closest ? e.target.closest(".row.task") : null;
-    if (!row || !rows.contains(row)) return;
-    pending = { row: row, x: e.clientX, y: e.clientY, id: e.pointerId };
-  });
-
-  rows.addEventListener("pointermove", function (e) {
-    if (pending && e.pointerId === pending.id) {
-      var dx = e.clientX - pending.x, dy = e.clientY - pending.y;
-      if (Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
-      var row = pending.row;
-      if (Math.abs(dy) > Math.abs(dx)) { pending = null; return; }   /* vertical: not ours */
-      var struck = row.classList.contains("struck");
-      if (struck) {
-        if (dx < 0) unstrike(row);                                    /* backward strike takes it off */
-        pending = null;
-        return;
-      }
-      /* begin the stroke */
-      var rr = rows.getBoundingClientRect();
-      var g = geo(row);
-      rows.setPointerCapture(e.pointerId);
-      active = {
-        row: row,
-        seed: Math.random() * 100,
-        g: g,
-        rr: rr,
-        pts: [],
-        minX: e.clientX - rr.left,
-        maxX: e.clientX - rr.left,
-        lastX: pending.x - rr.left,
-        lastY: pending.y - rr.top,
-        lastT: e.timeStamp,
-        w: NIB
-      };
-      /* the stroke starts where the press landed, not where the first move fired */
-      active.pts.push({ x: active.lastX, y: g.cy + wob(active.seed, active.lastX) * 1.1, w: NIB, seed: active.seed });
-      active.minX = Math.min(active.minX, active.lastX);
-      active.maxX = Math.max(active.maxX, active.lastX);
-      addPoint(e);
-      pending = null;
-      frame();
-      return;
-    }
-    if (active && rows.hasPointerCapture && rows.hasPointerCapture(e.pointerId)) {
-      addPoint(e);
-      frame();
-    }
-  });
-
-  function addPoint(e) {
-    var rr = active.rr, g = active.g;
-    var x = e.clientX - rr.left;
-    var yRaw = e.clientY - rr.top;
-    if (Math.abs(x - active.lastX) < 2 && active.pts.length) return;
-    var y = g.cy + Math.max(-8, Math.min(8, (yRaw - g.cy) * 0.35)) + wob(active.seed, x) * 1.1;
-    active.pts.push({ x: x, y: y, w: NIB, seed: active.seed });
-    active.minX = Math.min(active.minX, x);
-    active.maxX = Math.max(active.maxX, x);
-    active.lastX = x; active.lastY = yRaw; active.lastT = e.timeStamp;
-  }
-
-  function endGesture(e) {
-    pending = null;
-    if (!active) return;
-    if (rows.hasPointerCapture && rows.hasPointerCapture(e.pointerId)) rows.releasePointerCapture(e.pointerId);
-    var covered = (active.maxX - active.minX) / active.g.ww;
-    if (covered >= COMMIT) completeStrike(active.row);
-    else retractStrike();
-  }
-  rows.addEventListener("pointerup", endGesture);
-  rows.addEventListener("pointercancel", endGesture);
-
-  /* ---------- pre-struck line: a mark that was already made ---------- */
-  function synthStroke(row) {
-    var seed = Math.random() * 100;
-    var s = { seed: seed, pts: [] };
-    for (var u = -0.01; u <= 1.015; u += 0.03) {
-      s.pts.push({ u: u, dy: Math.sin(u * 5.1 + seed) * 0.45, w: NIB });
-    }
-    strokes.set(row, s);
-    /* The class is what fades the words to 40%; the map only draws the mark.
-       Setting both here keeps a hand-edited row from losing one of them. */
-    row.classList.add("struck");
-  }
-
-  /* ---------- the blank row: writing ---------- */
-  function focusPen() { pen.focus(); }
-  blankRow.addEventListener("click", focusPen);
-  rows.addEventListener("click", function (e) {
-    /* The padding rows are page, not line — clicking one is a click on the
-       sheet, and the sheet hands the pen to the row that takes writing. */
-    var pad = e.target.closest ? e.target.closest(".row.pad") : null;
-    if (pad || e.target === rows) focusPen();
-  });
-  pen.addEventListener("focus", function () { blankRow.classList.add("writing"); pen.style.opacity = 1; });
-  pen.addEventListener("blur", function () {
-    if (!pen.value) { blankRow.classList.remove("writing"); pen.style.opacity = 0; }
-  });
-  pen.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") { pen.value = ""; pen.blur(); }
-    if (e.key !== "Enter") return;
-    e.preventDefault();
-    commitLine(pen.value);
-    pen.value = "";
-  });
-
-  var DAYS = {
-    today: "today", tod: "today", tomorrow: "tomorrow", tom: "tomorrow",
-    monday: "monday", mon: "monday", tuesday: "tuesday", tue: "tuesday", tues: "tuesday",
-    wednesday: "wednesday", wed: "wednesday", thursday: "thursday", thu: "thursday", thur: "thursday", thurs: "thursday",
-    friday: "friday", fri: "friday", saturday: "saturday", sat: "saturday", sunday: "sunday", sun: "sunday"
-  };
-  /* How the app writes a day in the margin: today, tomorrow and yesterday as
-     the words, and every other day as its month-and-number. A weekday name
-     never appears there — TaskViews.dueLabel has no branch that produces one. */
-  var SHORT = { today: "today", tomorrow: "tomorrow", yesterday: "yesterday" };
-  var MONTHS = { jan: 1, feb: 1, mar: 1, apr: 1, may: 1, jun: 1, jul: 1, aug: 1, sep: 1, oct: 1, nov: 1, dec: 1 };
-
-  function commitLine(raw) {
-    var important = false, day = null, hour = null, repeat = false, area = null;
-    var title = String(raw);
-
-    title = title.replace(/(^|\s)!!(?=\s|$)/g, function (m, sp) { important = true; return sp; });
-    title = title.replace(/(^|\s)\.\.(\d+[dwmy]?|[dwmy])?(?=\s|$)/g, function (m, sp) { repeat = true; return sp; });
-    title = title.replace(/(^|\s)>(\S+)/g, function (m, sp, tok) {
-      var t = tok.toLowerCase();
-      if (DAYS[t]) { day = DAYS[t]; return sp; }
-      if (/^\d{1,2}(:\d{2})?(am|pm)$/.test(t) || /^\d{1,2}:\d{2}$/.test(t) || t === "noon" || t === "midnight") { hour = t; return sp; }
-      var md = t.match(/^([a-z]{3,9})(\d{1,2})$/);
-      if (md && MONTHS[md[1].slice(0, 3)]) { day = md[1].slice(0, 3) + " " + md[2]; return sp; }
-      return m;   /* an unparseable token stays in the title, at full ink */
-    });
-    title = title.replace(/(^|\s)[@#](\S+)/g, function (m, sp, name) { area = name; return sp; });
-    title = title.replace(/\s+/g, " ").trim();
-    if (!title) return;
-
-    /* WHAT THE MARGIN IS ALLOWED TO SAY. The app writes today, tomorrow and
-       yesterday as words and every other date as its month-and-number — never
-       a weekday name, because a line due on a named day files UNDER a heading
-       with that name, and a block that already states the day silences the
-       margin (PageLineView.marginDate). So a bare weekday prints nothing here
-       either; only its hour, if it was given one, survives to the margin. */
-    var named = SHORT[day] || (day && day.indexOf(" ") > 0 ? day : null);
-    var fig = null;
-    if (named) fig = hour ? named + ", " + hour : named;
-    else if (hour) fig = hour;
-    else if (area) fig = area;
-
-    var row = document.createElement("div");
-    row.className = "row task" + (important ? " hl" : "");
-    row.setAttribute("data-task", "");
-    row.setAttribute("data-typed", "");
-    var h = "";
-    /* The rail is always there — it is the apparatus zone, not the sigil.
-       A repeat puts two dots in it; everything else leaves it empty, and the
-       text still starts at the same 44pt margin either way. */
-    h += repeat ? '<span class="rail">..</span>' : '<span class="rail"></span>';
-    h += '<span class="title"><span class="words"></span></span>';
-    if (fig) h += '<span class="fig"></span>';
-    row.innerHTML = h;
-    row.querySelector(".words").textContent = title;
-    if (fig) row.querySelector(".fig").textContent = fig;
-    rows.insertBefore(row, blankRow);
-    /* Keep the writing row on the sheet: the card is a fixed 580, so once the
-       pen would cross the bottom rule, the oldest line the visitor wrote gives
-       up its place. Nothing typed is lost silently to a clipped caret. */
-    while (blankRow.offsetTop + 28 > rows.clientHeight) {
-      var oldest = rows.querySelector(".row.task[data-typed]");
-      if (!oldest) break;
-      strokes.delete(oldest);
-      oldest.remove();
-    }
-    sizeCanvas();
-    updateBeam();
-    frame();
-  }
-
-  /* ---------- boot ---------- */
-  function boot() {
-    sizeCanvas();
-    taskRows().forEach(function (r) {
-      if (r.hasAttribute("data-prestruck")) synthStroke(r);
-    });
-    updateBeam();
-    frame();
-  }
-  boot();
-
-  var rsTimer;
-  window.addEventListener("resize", function () {
-    clearTimeout(rsTimer);
-    rsTimer = setTimeout(function () { sizeCanvas(); frame(); }, 120);
-  });
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () { frame(); });
-
   barGlyph.addEventListener("click", function () {
     document.getElementById("card").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" });
   });
