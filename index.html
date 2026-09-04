@@ -35,6 +35,7 @@
     --desk1: #e3d8c3;
     --desk2: #dcd1bc;
     --sheen: transparent;
+    --pool-ink: rgba(63, 48, 28, 0.13);
     --barglass: rgba(250, 246, 238, 0.62);
     --btn-ink: #2b2620;
     --btn-paper: #f7efe1;
@@ -48,6 +49,7 @@
       --desk1: #141a1e;
       --desk2: #07090c;
       --sheen: rgba(255, 255, 255, 0.16);
+      --pool-ink: rgba(0, 0, 0, 0.35);
       --barglass: rgba(16, 20, 23, 0.55);
       --btn-ink: #d6e7dd;
       --btn-paper: #10161a;
@@ -186,6 +188,31 @@
   .reveal.d2 { animation-delay: 0.18s; }
   .reveal.d3 { animation-delay: 0.3s; }
   @keyframes rise { to { opacity: 1; transform: none; } }
+
+  /* ---------- the pool of light under the card ---------- */
+  /* A radial fall from the desk's own colour out to a shade under it, centred
+     on the film. THE CORE IS FLAT ON PURPOSE: the film is 454x607, so its
+     corner is 377px from the middle, and the feather needs the page to be one
+     unchanging colour that far out and a little further. Nothing fades before
+     442px, which clears that corner by sixty-five.
+     FIXED, AND WITH THE RADIUS WRITTEN DOWN. Laid as a sized element it had an
+     edge of its own — the fall reached full ink at the element's rim and the
+     bare page resumed below it, a horizontal seam a third of the way down.
+     Pinned to the viewport with the radius stated, the last stop simply runs
+     on for ever, so there is nothing to run out of. Below the content, above
+     the body's own ground, and it darkens rather than lightens so it works on
+     any desk. */
+  .pool {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(circle 1300px at var(--pool-x, 50%) var(--pool-y, 40%),
+      rgba(0, 0, 0, 0) 0,
+      rgba(0, 0, 0, 0) 442px,
+      var(--pool-ink) 1300px);
+  }
+
 
   /* ---------- the film ---------- */
   /* The card used to be rebuilt here in HTML, to the app's own numbers. It is
@@ -347,6 +374,11 @@
       <p class="hint reveal d3">macOS&nbsp;14 or later. Free for 14 days, then <strong>$19.99 once</strong> on the Mac App Store. No subscription, no account.</p>
     </div>
 
+    <!-- The light the card is standing in. Behind everything, centred under
+         the film, and dead flat for a good radius before it begins to fall —
+         see .pool: the fade must not start until well past the film's own
+         feathered edge, or the edge comes back. -->
+    <i class="pool" id="pool" aria-hidden="true"></i>
     <div class="cardwrap reveal d2" id="card">
       <!-- The app itself, recorded off the menu bar in one unbroken pass: no
            mock, no re-creation, every mark made by a hand on the real thing.
@@ -477,17 +509,39 @@
       "linear-gradient(180deg, " + deskTop + " 0, " + deskTop + " " + a.toFixed(2) + "%, " +
       deskFoot + " " + b.toFixed(2) + "%, " + deskFoot + " 100%)";
   }
+  var pool = document.getElementById("pool");
+  function placePool() {
+    if (!pool || !film) return;
+    var r = film.getBoundingClientRect();
+    if (!r.height) return;
+    pool.style.setProperty("--pool-x", Math.round(r.left + r.width / 2) + "px");
+    pool.style.setProperty("--pool-y", Math.round(r.top + r.height / 2) + "px");
+  }
+  /* PLACED AGAIN WHEN THE CARD STOPS MOVING. The hero reveals on a transform,
+     and a rect read mid-animation is the translated one — the pool landed
+     eighteen points low and stayed there. The card's own animation ending is
+     the signal; a ResizeObserver covers the rest (metadata arriving, a
+     reflow, a font landing late). */
+  if (pool && film) {
+    var wrap = film.closest(".cardwrap");
+    if (wrap) wrap.addEventListener("animationend", placePool);
+    if (window.ResizeObserver) new ResizeObserver(placePool).observe(film);
+    window.addEventListener("load", placePool);
+  }
+
   if (film) {
     var deskQueued = false;
     function queueDesk() {
       if (deskQueued) return;
       deskQueued = true;
-      requestAnimationFrame(function () { deskQueued = false; alignDesk(); });
+      requestAnimationFrame(function () { deskQueued = false; alignDesk(); placePool(); });
     }
     alignDesk();
+    placePool();
     window.addEventListener("resize", queueDesk);
     window.addEventListener("scroll", queueDesk, { passive: true });
-    if (film.readyState < 1) film.addEventListener("loadedmetadata", alignDesk, { once: true });
+    if (film.readyState < 1)
+      film.addEventListener("loadedmetadata", function () { alignDesk(); placePool(); }, { once: true });
   }
 
   /* ---------- the menu-bar glyph goes to the film ---------- */
