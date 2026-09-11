@@ -311,6 +311,21 @@
   footer .legal a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--ink-40); }
   footer .legal a:hover { color: var(--ink); border-bottom-color: var(--ink); }
 
+  /* ONE COLUMN, HALF THE AIR. The gaps between sections are cut to the
+     viewport's height, and a phone is tall for its width: at 812px the
+     same clamps that seat the desktop page put a hundred and thirty
+     pixels over the hero and a hundred and twenty between every section,
+     which on one column reads as the page running out of things to say.
+     Half of each, below the width the features go to one column at. */
+  @media (max-width: 759px) {
+    /* The hero's clamp counts from the page's top, and the menu bar takes
+       its first thirty; the extra keeps the headline the same distance
+       under the bar that the others keep between themselves. */
+    .hero { padding-top: clamp(64px, 10vh, 100px); }
+    .features, .cta { margin-top: clamp(45px, 7.5vh, 80px); }
+    footer { margin-top: clamp(35px, 5vh, 55px); }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .reveal { animation: none; opacity: 1; transform: none; }
     #barGlyph.tick .tickstroke { animation: none; transition: none; }
