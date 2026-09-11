@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
 <title>Struck — get struck, not stuck</title>
 <meta name="description" content="A calm little task manager for your Mac’s menu bar. It stays out of your way — until you need it to do something clever. Free for 14 days, then $19.99 once.">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -31,37 +32,25 @@
        sample reads a few levels lighter because the display profile lifts it,
        and matching that number leaves the page lighter than the film. The
        page runs the same fall in the same direction, so there is no edge to
-       see. The sheen belongs to the dark desk alone. */
+       see. */
     --desk1: #e3d8c3;
     --desk2: #dcd1bc;
-    --sheen: transparent;
     --pool-ink: rgba(63, 48, 28, 0.13);
     --barglass: rgba(250, 246, 238, 0.62);
     --btn-ink: #2b2620;
     --btn-paper: #f7efe1;
     --bar-h: 30px;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --ink: #d6e7dd;
-      --ink-40: rgba(214, 231, 221, 0.4);
-      --ink-soft: rgba(214, 231, 221, 0.5);
-      --desk1: #141a1e;
-      --desk2: #07090c;
-      --sheen: rgba(255, 255, 255, 0.16);
-      --pool-ink: rgba(0, 0, 0, 0.35);
-      --barglass: rgba(16, 20, 23, 0.55);
-      --btn-ink: #d6e7dd;
-      --btn-paper: #10161a;
-    }
-  }
+  /* ONE DESK, IN DAYLIGHT. There was a dark scheme here, keyed to the
+     system setting, and on a phone at night it came apart: the ink went
+     pale while the desk stayed light, and the hero was unreadable. The film
+     was shot on one desk in one light; the page keeps to it. The meta tag in
+     the head says so to the browser, so its own controls agree. */
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
-    background:
-      radial-gradient(120vw 80vh at 78% -10%, var(--sheen), transparent 60%),
-      linear-gradient(180deg, var(--desk1), var(--desk2));
+    background: linear-gradient(180deg, var(--desk1), var(--desk2));
     background-attachment: fixed;
     color: var(--ink);
     -webkit-font-smoothing: antialiased;
